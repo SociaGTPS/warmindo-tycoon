@@ -1,575 +1,983 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warmindo Tycoon - Ruko Bertingkat</title>
-    <style>
-        /* ==========================================================================
-           1. CSS STYLING & LAYOUT RUKO BERTINGKAT
-           ========================================================================== */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Warmindo Tycoon</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;}
+:root{
+  --gold:#FFD700;--gold2:#FFA500;--red:#D62828;--red2:#8B0000;
+  --green:#2ECC71;--green2:#1a7a44;--blue:#3498DB;--blue2:#1a5c8a;
+  --bg:#1a0a00;--panel:#2d1500;--panel2:#3d2010;--panel3:#4e2d18;
+  --text:#fff;--muted:#c4a882;--border:#6b3d1e;
+  --sky:#87CEEB;--sky2:#4a90d9;--ground:#5D4037;
+  --wall:#8B6347;--wall2:#a0734f;--roof:#c0392b;--roof2:#e74c3c;
+  --floor1:#d4a96a;--floor2:#c49458;--window:#add8e6;--door:#8B4513;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;}
+#app{
+  width:100%;max-width:430px;height:100svh;
+  margin:0 auto;display:flex;flex-direction:column;
+  background:var(--bg);font-family:'Nunito',sans-serif;
+  position:relative;overflow:hidden;
+}
 
-        body {
-            background-color: #0f172a;
-            color: #f8fafc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+/* ── TOP HUD ── */
+#hud{
+  background:linear-gradient(180deg,#1a0a00 0%,#2d1500 100%);
+  border-bottom:2px solid var(--gold);
+  padding:8px 12px 6px;flex-shrink:0;
+  display:flex;align-items:center;gap:8px;
+}
+#hud-left{flex:1;}
+#cabang-name{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;}
+#money-val{font-family:'Fredoka One',cursive;font-size:26px;color:var(--gold);line-height:1;}
+#per-sec{font-size:10px;color:var(--green);font-weight:700;}
+#hud-right{text-align:right;}
+.tag{display:inline-block;background:var(--gold);color:#1a0000;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;}
+.tag-prestige{background:#a855f7;color:#fff;margin-left:4px;}
+#level-ring{
+  width:44px;height:44px;border-radius:50%;
+  border:3px solid var(--gold);background:var(--panel2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+#level-ring .lv{font-size:8px;color:var(--muted);line-height:1;}
+#level-ring .lv-num{font-family:'Fredoka One',cursive;font-size:18px;color:var(--gold);line-height:1;}
 
-        .game-container {
-            width: 100%;
-            max-width: 480px;
-            height: 100vh;
-            background-color: #1e293b;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            overflow: hidden;
-        }
+/* ── GAME WORLD ── */
+#world{
+  flex:1;position:relative;overflow:hidden;
+  background:linear-gradient(180deg,#87CEEB 0%,#c9e8ff 60%,#a8d8a8 60%,#5D4037 100%);
+}
 
-        /* HEADER & STATUS BAR */
-        .header {
-            background-color: #b91c1c;
-            padding: 15px;
-            text-align: center;
-            border-bottom: 4px solid #eab308;
-        }
+/* CLOUDS */
+.cloud{position:absolute;opacity:.85;}
+.cloud svg{display:block;}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(460px)}}
 
-        .cabang-title {
-            font-size: 0.9rem;
-            color: #fef08a;
-            text-transform: uppercase;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
+/* RUKO BUILDING */
+#ruko{
+  position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:260px;
+}
+#ruko-svg{display:block;width:100%;overflow:visible;}
 
-        .money-display {
-            font-size: 2.2rem;
-            font-weight: bold;
-            color: #ffffff;
-            margin: 2px 0;
-        }
+/* LIFT TRACK */
+#lift-track{
+  position:absolute;right:0;top:0;bottom:0;width:36px;
+  display:flex;flex-direction:column;align-items:center;
+}
+#lift-car{
+  position:absolute;width:30px;height:30px;
+  background:#FFD700;border:2px solid #b8860b;border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;transition:top 0.6s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 2px 8px rgba(0,0,0,.4);
+  left:3px;
+}
+#lift-label{
+  position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);
+  font-size:8px;font-weight:800;color:#0f172a;white-space:nowrap;
+  background:var(--gold);padding:1px 4px;border-radius:3px;
+}
 
-        .multiplier-tag {
-            font-size: 0.8rem;
-            background-color: #eab308;
-            color: #0f172a;
-            padding: 2px 8px;
-            border-radius: 10px;
-            display: inline-block;
-            font-weight: bold;
-        }
+/* FLOOR PANELS overlaid on SVG */
+.floor-panel{
+  position:absolute;left:20px;right:46px;
+  background:rgba(0,0,0,.3);border-radius:6px;
+  padding:4px 6px;display:flex;align-items:center;gap:6px;
+}
+.fp-icon{font-size:18px;animation:none;flex-shrink:0;}
+.fp-icon.active{animation:bob 0.5s infinite alternate;}
+@keyframes bob{from{transform:translateY(0) rotate(-5deg)}to{transform:translateY(-4px) rotate(5deg)}}
+.fp-bar{flex:1;}
+.fp-label{font-size:9px;color:rgba(255,255,255,.7);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.fp-stock{font-size:12px;color:#fff;font-weight:800;line-height:1.1;}
+.fp-tap{
+  background:var(--gold);color:#1a0000;border:none;
+  font-size:9px;font-weight:800;padding:4px 8px;border-radius:10px;
+  cursor:pointer;flex-shrink:0;font-family:'Nunito',sans-serif;
+  transition:transform .1s;
+}
+.fp-tap:active{transform:scale(.92);}
+.fp-tap.disabled{background:#555;color:#999;cursor:default;}
 
-        /* TAMPILAN VISUAL RUKO (POTONGAN SAMPING) */
-        .ruko-view {
-            flex: 1;
-            background-color: #334155;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            padding: 10px;
-            gap: 10px;
-        }
+/* CUSTOMER PARADE */
+#customer-lane{
+  position:absolute;bottom:4px;left:0;right:0;height:36px;
+  overflow:hidden;
+}
+.customer{
+  position:absolute;font-size:22px;
+  animation:walk linear infinite;
+  bottom:2px;
+}
+@keyframes walk{
+  from{transform:translateX(-40px) scaleX(-1);}
+  to{transform:translateX(440px) scaleX(-1);}
+}
 
-        /* LIFT VERTIKAL (SISI KIRI) */
-        .lift-shaft {
-            position: absolute;
-            left: 10px;
-            top: 10px;
-            bottom: 10px;
-            width: 50px;
-            background-color: #1e293b;
-            border-radius: 8px;
-            border: 2px dashed #475569;
-        }
+/* INCOME POPUP */
+.income-pop{
+  position:absolute;font-family:'Fredoka One',cursive;
+  font-size:14px;color:var(--green);
+  pointer-events:none;font-weight:bold;
+  text-shadow:0 1px 4px rgba(0,0,0,.5);
+  animation:float-up 1.2s ease-out forwards;
+}
+@keyframes float-up{
+  0%{opacity:1;transform:translateY(0) scale(1);}
+  80%{opacity:1;transform:translateY(-40px) scale(1.1);}
+  100%{opacity:0;transform:translateY(-60px) scale(.8);}
+}
 
-        .lift-box {
-            position: absolute;
-            left: 2px;
-            width: 42px;
-            height: 42px;
-            background-color: #eab308;
-            border-radius: 6px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.2rem;
-            transition: top 0.5s ease-in-out;
-            font-weight: bold;
-        }
+/* TAP RIPPLE */
+.ripple{
+  position:absolute;border-radius:50%;
+  border:2px solid var(--gold);pointer-events:none;
+  animation:ripple-out .5s ease-out forwards;
+}
+@keyframes ripple-out{
+  from{width:10px;height:10px;opacity:1;margin:-5px;}
+  to{width:60px;height:60px;opacity:0;margin:-30px;}
+}
 
-        .lift-box span {
-            font-size: 0.6rem;
-            color: #0f172a;
-        }
+/* ── BOTTOM TABS ── */
+#tabs{
+  display:flex;background:var(--panel);
+  border-top:2px solid var(--border);flex-shrink:0;
+}
+.tab{
+  flex:1;padding:8px 0 6px;background:none;border:none;
+  color:var(--muted);font-size:9px;font-weight:800;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  letter-spacing:.5px;text-transform:uppercase;transition:color .2s;
+  font-family:'Nunito',sans-serif;
+}
+.tab-icon{font-size:18px;line-height:1;}
+.tab.active{color:var(--gold);}
+.tab.active .tab-icon{filter:drop-shadow(0 0 4px rgba(255,215,0,.6));}
 
-        /* LANTAI-LANTAI RUKO */
-        .floor {
-            margin-left: 60px;
-            flex: 1;
-            background-color: #475569;
-            border-radius: 8px;
-            border: 2px solid #64748b;
-            padding: 10px;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+/* ── PANELS ── */
+#panel{
+  height:200px;background:var(--panel);
+  border-top:1px solid var(--border);
+  overflow-y:auto;flex-shrink:0;
+}
+#panel::-webkit-scrollbar{width:3px;}
+#panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 
-        .floor-title {
-            font-size: 0.8rem;
-            font-weight: bold;
-            color: #94a3b8;
-            text-transform: uppercase;
-        }
+.panel-section{padding:10px 12px;}
+.panel-title{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:8px;}
 
-        .animation-row {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin: 10px 0;
-            font-size: 1.8rem;
-        }
+/* UPGRADE CARDS */
+.upg-card{
+  background:var(--panel2);border:1px solid var(--border);
+  border-radius:10px;padding:10px 12px;margin-bottom:8px;
+  display:flex;align-items:center;gap:10px;
+}
+.upg-icon{font-size:28px;flex-shrink:0;}
+.upg-info{flex:1;}
+.upg-name{font-size:13px;font-weight:800;color:#fff;}
+.upg-desc{font-size:10px;color:var(--muted);margin-top:2px;}
+.upg-bars{display:flex;gap:3px;margin-top:5px;}
+.upg-pip{width:14px;height:5px;border-radius:2px;background:var(--panel3);}
+.upg-pip.filled{background:var(--gold);}
+.upg-btn{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#1a0000;border:none;padding:8px 12px;border-radius:8px;
+  font-weight:800;font-size:11px;cursor:pointer;flex-shrink:0;
+  font-family:'Nunito',sans-serif;transition:transform .1s,opacity .2s;
+  white-space:nowrap;
+}
+.upg-btn:active{transform:scale(.93);}
+.upg-btn:disabled{background:var(--panel3);color:#666;cursor:default;opacity:.7;}
+.upg-btn.maxed{background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;}
 
-        /* ELEMEN GERAK */
-        .koki, .pelanggan {
-            display: inline-block;
-            transition: transform 0.1s;
-        }
+/* PRESTIGE PANEL */
+.prestige-card{
+  background:linear-gradient(135deg,#1a0030,#300050);
+  border:1px solid #a855f7;border-radius:12px;
+  padding:14px;margin-bottom:10px;
+}
+.prestige-title{font-family:'Fredoka One',cursive;font-size:16px;color:#d8b4fe;}
+.prestige-desc{font-size:11px;color:#c4b5fd;margin:4px 0 10px;}
+.prestige-btn{
+  width:100%;padding:10px;background:linear-gradient(135deg,#7c3aed,#a855f7);
+  color:#fff;border:none;border-radius:8px;font-weight:800;font-size:13px;
+  cursor:pointer;font-family:'Nunito',sans-serif;
+}
+.prestige-btn:disabled{opacity:.4;cursor:default;}
 
-        .cooking-active {
-            animation: shake 0.5s infinite;
-        }
+/* ACHIEVEMENT CARD */
+.ach-card{
+  background:var(--panel2);border:1px solid var(--border);
+  border-radius:8px;padding:8px 12px;margin-bottom:6px;
+  display:flex;align-items:center;gap:10px;
+}
+.ach-icon{font-size:24px;}
+.ach-info .ach-name{font-size:12px;font-weight:800;color:#fff;}
+.ach-info .ach-desc{font-size:10px;color:var(--muted);}
+.ach-card.locked{opacity:.45;}
+.ach-badge{margin-left:auto;background:var(--gold);color:#1a0000;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;}
 
-        @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            30% { transform: translate(0px, 2px) rotate(0deg); }
-            50% { transform: translate(1px, -1px) rotate(1deg); }
-            100% { transform: translate(0px, 0px) rotate(0deg); }
-        }
+/* BOOSTER CARD */
+.boost-card{
+  background:linear-gradient(135deg,#0d2d0d,#1a4a1a);
+  border:1px solid #2ECC71;border-radius:12px;padding:12px;margin-bottom:8px;
+}
+.boost-title{font-family:'Fredoka One',cursive;font-size:15px;color:#2ECC71;}
+.boost-desc{font-size:10px;color:#a8e6c0;margin:4px 0 10px;}
+.boost-btn{
+  width:100%;padding:10px;background:linear-gradient(135deg,#16a34a,#22c55e);
+  color:#fff;border:none;border-radius:8px;font-weight:800;font-size:13px;
+  cursor:pointer;font-family:'Nunito',sans-serif;
+}
+.boost-btn:disabled{opacity:.4;cursor:default;}
+.boost-timer{text-align:center;font-size:12px;color:#2ECC71;font-weight:800;margin-top:6px;display:none;}
 
-        .counter-stock {
-            font-size: 0.9rem;
-            background: #1e293b;
-            padding: 2px 6px;
-            border-radius: 5px;
-            color: #f8fafc;
-        }
+/* NOTIFICATION TOAST */
+#toast{
+  position:absolute;top:70px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.85);border:1px solid var(--gold);
+  color:#fff;font-size:12px;font-weight:700;padding:8px 16px;border-radius:20px;
+  opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:999;
+}
+#toast.show{opacity:1;}
 
-        /* MENU TABS DI BAGIAN BAWAH */
-        .tab-navigation {
-            display: flex;
-            background-color: #1e293b;
-            border-top: 2px solid #334155;
-        }
+/* MODAL */
+#modal-bg{
+  position:absolute;inset:0;background:rgba(0,0,0,.75);
+  display:none;align-items:center;justify-content:center;z-index:900;
+}
+#modal-bg.open{display:flex;}
+#modal{
+  background:var(--panel);border:2px solid var(--gold);border-radius:14px;
+  padding:20px;width:85%;max-width:320px;
+}
+#modal h2{font-family:'Fredoka One',cursive;color:var(--gold);font-size:18px;margin-bottom:8px;}
+#modal p{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5;}
+.modal-btns{display:flex;gap:8px;}
+.modal-btns button{
+  flex:1;padding:10px;border:none;border-radius:8px;font-weight:800;font-size:13px;
+  cursor:pointer;font-family:'Nunito',sans-serif;
+}
+#modal-ok{background:var(--gold);color:#1a0000;}
+#modal-cancel{background:var(--panel3);color:var(--muted);}
 
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            background: none;
-            border: none;
-            color: #94a3b8;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .tab-btn.active {
-            color: #eab308;
-            border-bottom: 3px solid #eab308;
-            background-color: #0f172a;
-        }
-
-        .panel-content {
-            height: 35%;
-            background-color: #0f172a;
-            overflow-y: auto;
-            padding: 15px;
-        }
-
-        .hidden { display: none !important; }
-
-        /* KARTU UPGRADE / TOKO */
-        .card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #1e293b;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border-left: 4px solid #b91c1c;
-        }
-
-        .card-info h3 { font-size: 0.95rem; color: #ffffff; }
-        .card-info p { font-size: 0.8rem; color: #94a3b8; }
-
-        .buy-btn {
-            background-color: #eab308;
-            color: #0f172a;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .buy-btn:disabled {
-            background-color: #475569;
-            color: #94a3b8;
-            cursor: not-allowed;
-        }
-
-        .booster-btn {
-            width: 100%;
-            padding: 10px;
-            background-color: #16a34a;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-    </style>
+/* ── SCROLLBAR ── */
+#panel::-webkit-scrollbar-track{background:var(--panel);}
+</style>
 </head>
 <body>
+<div id="app">
 
-    <div class="game-container">
-        <div class="header">
-            <div class="cabang-title" id="text-cabang">Cabang 1: Sukamulya</div>
-            <div class="money-display" id="text-money">Rp 0</div>
-            <div class="multiplier-tag" id="text-multiplier">Multiplier: 1x</div>
-        </div>
+  <!-- HUD -->
+  <div id="hud">
+    <div id="hud-left">
+      <div id="cabang-name">CABANG 1 — SUKAMULYA</div>
+      <div id="money-val">Rp 0</div>
+      <div id="per-sec">+Rp 0/dtk</div>
+    </div>
+    <div id="level-ring">
+      <div class="lv">LEVEL</div>
+      <div class="lv-num" id="total-level">1</div>
+    </div>
+    <div id="hud-right">
+      <div class="tag" id="tag-mult">1x</div>
+      <div class="tag tag-prestige" id="tag-prestige" style="display:none;">✦ Prestige</div>
+    </div>
+  </div>
 
-        <div class="ruko-view">
-            <div class="lift-shaft">
-                <div class="lift-box" id="visual-lift">
-                    🍱
-                    <span id="lift-load">0/0</span>
-                </div>
-            </div>
+  <!-- GAME WORLD -->
+  <div id="world">
 
-            <div class="floor" id="floor-dapur">
-                <div class="floor-title">Lantai 2: Dapur Produksi</div>
-                <div class="animation-row">
-                    <div class="koki" id="visual-koki">👨‍🍳</div>
-                    <div style="font-size: 1.2rem;">🍲 ➡️</div>
-                    <div class="counter-stock" id="stock-dapur">Stok: 0 piring</div>
-                </div>
-                <div id="dapur-status" style="font-size: 0.75rem; color: #cbd5e1;">Tap koki untuk mulai masak!</div>
-            </div>
+    <!-- SVG RUKO -->
+    <div id="ruko">
+      <svg id="ruko-svg" viewBox="0 0 260 320" xmlns="http://www.w3.org/2000/svg">
+        <!-- Sky tint -->
+        <!-- Ground -->
+        <rect x="0" y="300" width="260" height="20" fill="#5D4037"/>
+        <!-- Grass strip -->
+        <rect x="0" y="296" width="260" height="8" fill="#4CAF50" rx="2"/>
 
-            <div class="floor" id="floor-dining">
-                <div class="floor-title">Lantai 1: Meja Makan AC</div>
-                <div class="animation-row">
-                    <div class="counter-stock" id="stock-meja">Meja: 0 mi</div>
-                    <div style="font-size: 1.2rem;">➡️ 🧑‍🤝‍🧑</div>
-                    <div class="pelanggan">🍜</div>
-                </div>
-                <div id="dining-status" style="font-size: 0.75rem; color: #cbd5e1;">Menunggu kiriman lift...</div>
-            </div>
-        </div>
+        <!-- BASEMENT / GROUND FLOOR (meja makan) -->
+        <rect x="10" y="200" width="200" height="100" fill="#a0734f" rx="4"/>
+        <rect x="10" y="200" width="200" height="6" fill="#c49458"/><!-- ceiling line -->
+        <!-- Floor boards -->
+        <rect x="10" y="288" width="200" height="12" fill="#8B6347"/>
+        <!-- Windows ground floor -->
+        <rect x="20" y="215" width="35" height="28" fill="#add8e6" rx="2" opacity=".9"/>
+        <rect x="30" y="215" width="1" height="28" fill="#fff" opacity=".4"/>
+        <rect x="20" y="229" width="35" height="1" fill="#fff" opacity=".4"/>
+        <rect x="70" y="215" width="35" height="28" fill="#add8e6" rx="2" opacity=".9"/>
+        <rect x="80" y="215" width="1" height="28" fill="#fff" opacity=".4"/>
+        <rect x="70" y="229" width="35" height="1" fill="#fff" opacity=".4"/>
+        <!-- Door -->
+        <rect x="150" y="248" width="40" height="52" fill="#6D4C41" rx="3"/>
+        <rect x="153" y="251" width="15" height="25" fill="#5D4037" rx="2"/>
+        <rect x="171" y="251" width="15" height="25" fill="#5D4037" rx="2"/>
+        <circle cx="168" cy="275" r="2.5" fill="#FFD700"/>
+        <circle cx="182" cy="275" r="2.5" fill="#FFD700"/>
+        <!-- Signboard -->
+        <rect x="15" y="202" width="130" height="18" fill="#D62828" rx="3"/>
+        <text x="80" y="214" text-anchor="middle" font-family="Fredoka One,cursive" font-size="10" fill="#FFD700">WARMINDO BANG UDIN</text>
 
-        <div class="tab-navigation">
-            <button class="tab-btn active" onclick="switchTab('upgrade')">🏠 UPGRADE</button>
-            <button class="tab-btn" onclick="switchTab('cabang')">🗺️ CABANG MAP</button>
-            <button class="tab-btn" onclick="switchTab('iklan')">🎬 BOOSTER</button>
-        </div>
+        <!-- SECOND FLOOR (dapur) -->
+        <rect x="10" y="100" width="200" height="100" fill="#b87d4f" rx="4"/>
+        <rect x="10" y="100" width="200" height="5" fill="#d4a96a"/>
+        <rect x="10" y="194" width="200" height="6" fill="#8B6347"/><!-- divider -->
+        <!-- Windows 2nd floor -->
+        <rect x="20" y="115" width="35" height="28" fill="#add8e6" rx="2" opacity=".9"/>
+        <rect x="30" y="115" width="1" height="28" fill="#fff" opacity=".4"/>
+        <rect x="20" y="129" width="35" height="1" fill="#fff" opacity=".4"/>
+        <rect x="70" y="115" width="35" height="28" fill="#fff8e1" rx="2" opacity=".8"/>
+        <!-- 2nd floor label -->
+        <rect x="95" y="113" width="110" height="14" fill="#b91c1c" rx="2"/>
+        <text x="150" y="123" text-anchor="middle" font-family="Fredoka One,cursive" font-size="8" fill="#fef08a">🍳 DAPUR PRODUKSI</text>
 
-        <div class="panel-content" id="tab-upgrade">
-            <div class="card">
-                <div class="card-info">
-                    <h3 id="up-koki-title">Koki & Kompor (Lv 1)</h3>
-                    <p id="up-koki-desc">Masak manual (+1 mi/tap)</p>
-                </div>
-                <button class="buy-btn" id="btn-up-koki" onclick="upgrade('koki')">Lv Up</button>
-            </div>
-            <div class="card">
-                <div class="card-info">
-                    <h3 id="up-lift-title">Kapasitas Lift (Lv 1)</h3>
-                    <p id="up-lift-desc">Angkut maks: 5 piring</p>
-                </div>
-                <button class="buy-btn" id="btn-up-lift" onclick="upgrade('lift')">Lv Up</button>
-            </div>
-            <div class="card">
-                <div class="card-info">
-                    <h3 id="up-dining-title">Fasilitas Meja (Lv 1)</h3>
-                    <p id="up-dining-desc">Harga jual: Rp 10 /mi</p>
-                </div>
-                <button class="buy-btn" id="btn-up-dining" onclick="upgrade('dining')">Lv Up</button>
-            </div>
-        </div>
+        <!-- ROOF / ATTIC -->
+        <polygon points="5,100 130,40 255,100" fill="#c0392b"/>
+        <polygon points="15,100 130,50 245,100" fill="#e74c3c"/>
+        <!-- Roof ridge tile -->
+        <rect x="120" y="39" width="20" height="8" fill="#c0392b" rx="2"/>
+        <!-- Chimney -->
+        <rect x="55" y="48" width="18" height="38" fill="#8B6347" rx="2"/>
+        <rect x="52" y="44" width="24" height="8" fill="#a0734f" rx="2"/>
+        <!-- Smoke from chimney (animated via JS) -->
+        <circle id="smoke1" cx="64" cy="40" r="5" fill="rgba(200,200,200,0.5)" opacity="0"/>
+        <circle id="smoke2" cx="60" cy="28" r="7" fill="rgba(200,200,200,0.4)" opacity="0"/>
+        <circle id="smoke3" cx="67" cy="18" r="6" fill="rgba(200,200,200,0.3)" opacity="0"/>
 
-        <div class="panel-content hidden" id="tab-cabang">
-            <div style="font-size: 0.85rem; margin-bottom: 10px; color:#fef08a;">
-                *Membuka cabang baru akan meriset uang dan level ruko saat ini, namun kamu mendapatkan Multiplier Pendapatan Permanen!
-            </div>
-            <div class="card" id="card-cabang-2">
-                <div class="card-info">
-                    <h3>Cabang 2: Kresek</h3>
-                    <p>Bonus Pendapatan: 3x Kelipatan</p>
-                </div>
-                <button class="buy-btn" id="btn-cabang-2" onclick="bukaCabang(2, 5000, 3, 'Kresek')">Buka [Rp 5.000]</button>
-            </div>
-            <div class="card" id="card-cabang-3">
-                <div class="card-info">
-                    <h3>Cabang 3: Gading Serpong</h3>
-                    <p>Bonus Pendapatan: 16x Kelipatan</p>
-                </div>
-                <button class="buy-btn" id="btn-cabang-3" onclick="bukaCabang(3, 50000, 16, 'Gading Serpong')">Buka [Rp 50.000]</button>
-            </div>
-        </div>
+        <!-- LIFT SHAFT (right side) -->
+        <rect x="215" y="90" width="34" height="215" fill="#1e293b" rx="4" opacity=".9"/>
+        <rect x="218" y="93" width="28" height="209" fill="#0f172a" rx="3"/>
+        <!-- Shaft rails -->
+        <line x1="226" y1="93" x2="226" y2="302" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4"/>
+        <line x1="238" y1="93" x2="238" y2="302" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4"/>
+        <!-- Shaft label -->
+        <text x="232" y="106" text-anchor="middle" font-family="Nunito,sans-serif" font-size="7" fill="#475569" font-weight="700">LIFT</text>
+      </svg>
 
-        <div class="panel-content hidden" id="tab-iklan">
-            <button class="booster-btn" id="btn-booster" onclick="putarIklan()">🎬 TONTON IKLAN (SPEED BOOSTER 2X)</button>
-            <p style="font-size: 0.8rem; text-align: center; color: #94a3b8;">
-                Tonton iklan simulasi 5 detik untuk mengaktifkan mode turbo! Seluruh proses masak dan antar berjalan 2x lebih cepat selama 30 detik.
-            </p>
-        </div>
+      <!-- LIFT CAR overlaid -->
+      <div id="lift-car" style="top:20px;">
+        🍱
+        <div id="lift-label">0</div>
+      </div>
     </div>
 
-    <script>
-        // DATA STATE UTAMA (JSON DATA STRUCTURE)
-        let saveTemplate = {
-            money: 0,
-            currentCabangId: 1,
-            currentCabangName: "Sukamulya",
-            globalMultiplier: 1,
-            
-            // Level Upgrade
-            kokiLevel: 1,
-            kokiCost: 50,
-            liftLevel: 1,
-            liftCost: 80,
-            diningLevel: 1,
-            diningCost: 100,
+    <!-- FLOOR PANELS -->
+    <!-- Dapur (Floor 2) -->
+    <div class="floor-panel" id="fp-dapur" style="bottom:172px;">
+      <div class="fp-icon" id="icon-koki">👨‍🍳</div>
+      <div class="fp-bar">
+        <div class="fp-label">Dapur</div>
+        <div class="fp-stock" id="st-dapur">0 piring</div>
+      </div>
+      <button class="fp-tap" id="btn-tap-koki" onclick="tapKoki()">TAP MASAK</button>
+    </div>
+    <!-- Meja Makan (Floor 1) -->
+    <div class="floor-panel" id="fp-dining" style="bottom:70px;">
+      <div class="fp-icon">🍜</div>
+      <div class="fp-bar">
+        <div class="fp-label">Meja Makan</div>
+        <div class="fp-stock" id="st-dining">0 porsi</div>
+      </div>
+      <div style="font-size:9px;color:#2ECC71;font-weight:800;" id="dining-rate">Rp 0/dtk</div>
+    </div>
 
-            // Stok Logistik Internal
-            stockAtDapur: 0,
-            stockAtLift: 0,
-            stockAtDining: 0
-        };
+    <!-- CUSTOMER LANE -->
+    <div id="customer-lane"></div>
 
-        let player = Object.assign({}, saveTemplate);
+    <!-- CLOUDS -->
+    <div class="cloud" id="cloud1" style="top:8%;left:-120px;animation:drift 18s linear infinite;">
+      <svg width="100" height="40" viewBox="0 0 100 40"><ellipse cx="50" cy="28" rx="48" ry="16" fill="white" opacity=".9"/><ellipse cx="35" cy="22" rx="25" ry="18" fill="white" opacity=".9"/><ellipse cx="65" cy="20" rx="22" ry="16" fill="white" opacity=".9"/></svg>
+    </div>
+    <div class="cloud" id="cloud2" style="top:5%;left:-200px;animation:drift 26s linear infinite 8s;">
+      <svg width="75" height="30" viewBox="0 0 75 30"><ellipse cx="37" cy="20" rx="36" ry="12" fill="white" opacity=".7"/><ellipse cx="25" cy="16" rx="19" ry="14" fill="white" opacity=".7"/><ellipse cx="52" cy="14" rx="16" ry="12" fill="white" opacity=".7"/></svg>
+    </div>
+  </div>
 
-        // State Runtime (Tidak Disimpan saat exit)
-        let systemMultiplier = 1; // Untuk Booster Iklan
-        let liftPosition = "top"; // top atau bottom
+  <!-- TABS -->
+  <div id="tabs">
+    <button class="tab active" onclick="switchTab('upgrade',this)">
+      <div class="tab-icon">⬆️</div>UPGRADE
+    </button>
+    <button class="tab" onclick="switchTab('prestige',this)">
+      <div class="tab-icon">🗺️</div>CABANG
+    </button>
+    <button class="tab" onclick="switchTab('boost',this)">
+      <div class="tab-icon">🚀</div>BOOSTER
+    </button>
+    <button class="tab" onclick="switchTab('ach',this)">
+      <div class="tab-icon">🏆</div>TROFI
+    </button>
+  </div>
 
-        // Ambil Elemen DOM
-        const textMoney = document.getElementById('text-money');
-        const textCabang = document.getElementById('text-cabang');
-        const textMultiplier = document.getElementById('text-multiplier');
-        const stockDapur = document.getElementById('stock-dapur');
-        const stockMeja = document.getElementById('stock-meja');
-        const liftLoad = document.getElementById('lift-load');
-        const visualLift = document.getElementById('visual-lift');
-        const visualKoki = document.getElementById('visual-koki');
-        const btnBooster = document.getElementById('btn-booster');
+  <!-- PANEL -->
+  <div id="panel">
+    <!-- UPGRADE -->
+    <div class="panel-section" id="tab-upgrade">
+      <div class="panel-title">🔧 UPGRADE RUKO</div>
 
-        // Navigasi Tab
-        function switchTab(tabName) {
-            document.getElementById('tab-upgrade').classList.add('hidden');
-            document.getElementById('tab-cabang').classList.add('hidden');
-            document.getElementById('tab-iklan').classList.add('hidden');
-            
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            
-            document.getElementById('tab-' + tabName).classList.remove('hidden');
-            event.target.classList.add('active');
-        }
+      <div class="upg-card">
+        <div class="upg-icon">👨‍🍳</div>
+        <div class="upg-info">
+          <div class="upg-name" id="u-koki-name">Koki & Kompor — Lv 1</div>
+          <div class="upg-desc" id="u-koki-desc">Tap untuk masak +1 piring</div>
+          <div class="upg-bars" id="u-koki-bars"></div>
+        </div>
+        <button class="upg-btn" id="btn-u-koki" onclick="doUpgrade('koki')">
+          <span id="u-koki-cost">Rp 50</span>
+        </button>
+      </div>
 
-        // FORMAT RUPIAH
-        function formatRp(num) {
-            return "Rp " + Math.floor(num).toLocaleString('id-ID');
-        }
+      <div class="upg-card">
+        <div class="upg-icon">🛗</div>
+        <div class="upg-info">
+          <div class="upg-name" id="u-lift-name">Kapasitas Lift — Lv 1</div>
+          <div class="upg-desc" id="u-lift-desc">Angkut maks 5 piring/trip</div>
+          <div class="upg-bars" id="u-lift-bars"></div>
+        </div>
+        <button class="upg-btn" id="btn-u-lift" onclick="doUpgrade('lift')">
+          <span id="u-lift-cost">Rp 80</span>
+        </button>
+      </div>
 
-        // UPDATE UI KELAS DUNIA
-        function refreshUI() {
-            textMoney.innerText = formatRp(player.money);
-            textCabang.innerText = `Cabang ${player.currentCabangId}: ${player.currentCabangName}`;
-            textMultiplier.innerText = `Multiplier: ${player.globalMultiplier * systemMultiplier}x`;
+      <div class="upg-card">
+        <div class="upg-icon">🪑</div>
+        <div class="upg-info">
+          <div class="upg-name" id="u-dining-name">Fasilitas Meja — Lv 1</div>
+          <div class="upg-desc" id="u-dining-desc">Harga jual Rp 10/porsi</div>
+          <div class="upg-bars" id="u-dining-bars"></div>
+        </div>
+        <button class="upg-btn" id="btn-u-dining" onclick="doUpgrade('dining')">
+          <span id="u-dining-cost">Rp 100</span>
+        </button>
+      </div>
 
-            stockDapur.innerText = `Stok: ${player.stockAtDapur} piring`;
-            stockMeja.innerText = `Meja: ${player.stockAtDining} mi`;
-            liftLoad.innerText = `${player.stockAtLift}/${getMaxLiftCapacity()}`;
+      <div class="upg-card">
+        <div class="upg-icon">📣</div>
+        <div class="upg-info">
+          <div class="upg-name" id="u-marketing-name">Spanduk & Promosi — Lv 1</div>
+          <div class="upg-desc" id="u-marketing-desc">Pelanggan datang 1x/dtk</div>
+          <div class="upg-bars" id="u-marketing-bars"></div>
+        </div>
+        <button class="upg-btn" id="btn-u-marketing" onclick="doUpgrade('marketing')">
+          <span id="u-marketing-cost">Rp 200</span>
+        </button>
+      </div>
+    </div>
 
-            // Detail Teks Card Upgrade
-            document.getElementById('up-koki-title').innerText = `Koki & Kompor (Lv ${player.kokiLevel})`;
-            document.getElementById('up-koki-desc').innerText = player.kokiLevel >= 3 ? `Otomatis masak: +${getCookPower()} mi/detik` : `Masak manual (+${getCookPower()} mi/tap)`;
-            document.getElementById('btn-up-koki').innerText = `Up [${formatRp(player.kokiCost)}]`;
-            document.getElementById('btn-up-koki').disabled = player.money < player.kokiCost;
+    <!-- PRESTIGE / CABANG -->
+    <div class="panel-section hidden" id="tab-prestige">
+      <div class="panel-title">🗺️ BUKA CABANG BARU</div>
+      <p style="font-size:10px;color:var(--muted);margin-bottom:10px;">Membuka cabang baru mereset progress, tapi memberi multiplier penghasilan permanen!</p>
 
-            document.getElementById('up-lift-title').innerText = `Kapasitas Lift (Lv ${player.liftLevel})`;
-            document.getElementById('up-lift-desc').innerText = `Angkut maks: ${getMaxLiftCapacity()} piring`;
-            document.getElementById('btn-up-lift').innerText = `Up [${formatRp(player.liftCost)}]`;
-            document.getElementById('btn-up-lift').disabled = player.money < player.liftCost;
+      <div class="prestige-card" id="pc-2">
+        <div class="prestige-title">Cabang 2 — Kresek 🏪</div>
+        <div class="prestige-desc">Butuh Rp 5.000 · Bonus 3× pendapatan permanen</div>
+        <button class="prestige-btn" id="btn-cab2" onclick="openPrestigeModal(2,5000,3,'Kresek')">Buka Cabang [Rp 5.000]</button>
+      </div>
 
-            document.getElementById('up-dining-title').innerText = `Fasilitas Meja (Lv ${player.diningLevel})`;
-            document.getElementById('up-dining-desc').innerText = `Harga jual: ${formatRp(getFoodPrice())} /mi`;
-            document.getElementById('btn-up-dining').innerText = `Up [${formatRp(player.diningCost)}]`;
-            document.getElementById('btn-up-dining').disabled = player.money < player.diningCost;
+      <div class="prestige-card" id="pc-3">
+        <div class="prestige-title">Cabang 3 — Gading Serpong 🏬</div>
+        <div class="prestige-desc">Butuh Rp 50.000 · Bonus 16× pendapatan permanen</div>
+        <button class="prestige-btn" id="btn-cab3" onclick="openPrestigeModal(3,50000,16,'Gading Serpong')">Buka Cabang [Rp 50.000]</button>
+      </div>
 
-            // Validasi tombol cabang
-            if(document.getElementById('btn-cabang-2')) document.getElementById('btn-cabang-2').disabled = player.money < 5000 || player.currentCabangId >= 2;
-            if(document.getElementById('btn-cabang-3')) document.getElementById('btn-cabang-3').disabled = player.money < 50000 || player.currentCabangId >= 3;
-        }
+      <div class="prestige-card" id="pc-4">
+        <div class="prestige-title">Cabang 4 — BSD City 🏢</div>
+        <div class="prestige-desc">Butuh Rp 500.000 · Bonus 100× pendapatan permanen</div>
+        <button class="prestige-btn" id="btn-cab4" onclick="openPrestigeModal(4,500000,100,'BSD City')">Buka Cabang [Rp 500.000]</button>
+      </div>
+    </div>
 
-        // HITUNG FORMULA MATEMATIKA EKONOMI GAME
-        function getCookPower() { return player.kokiLevel * 1; }
-        function getMaxLiftCapacity() { return player.liftLevel * 5; }
-        function getFoodPrice() { return player.diningLevel * 10; }
+    <!-- BOOSTER -->
+    <div class="panel-section hidden" id="tab-boost">
+      <div class="panel-title">🚀 BOOSTER</div>
+      <div class="boost-card">
+        <div class="boost-title">⚡ Speed Boost 2×</div>
+        <div class="boost-desc">Tonton iklan simulasi 5 detik. Semua produksi & penghasilan 2× lebih cepat selama 30 detik!</div>
+        <button class="boost-btn" id="btn-boost" onclick="watchAd()">🎬 TONTON IKLAN</button>
+        <div class="boost-timer" id="boost-timer">Aktif: 30s</div>
+      </div>
+      <div class="boost-card" style="background:linear-gradient(135deg,#0d1a2d,#1a2d4a);border-color:#3498DB;">
+        <div class="boost-title" style="color:#3498DB;">💰 Bonus Uang Tunai</div>
+        <div class="boost-desc" style="color:#a8c8e8;">Tonton iklan bonus untuk mendapat langsung Rp 500 tunai!</div>
+        <button class="boost-btn" style="background:linear-gradient(135deg,#1a5c8a,#3498DB);" id="btn-boost2" onclick="watchAd2()">🎬 TONTON IKLAN BONUS</button>
+        <div class="boost-timer" id="boost-timer2" style="color:#3498DB;"></div>
+      </div>
+    </div>
 
-        // AKSI TAP KOKI (LANTAI 2 MANUAL PRODUKSI)
-        visualKoki.addEventListener('click', () => {
-            if (player.kokiLevel < 3) { // Jika belum otomatis otomatis
-                triggerCookingAnimation();
-                player.stockAtDapur += getCookPower();
-                refreshUI();
-            }
-        });
+    <!-- ACHIEVEMENTS -->
+    <div class="panel-section hidden" id="tab-ach">
+      <div class="panel-title">🏆 TROFI PENCAPAIAN</div>
+      <div id="ach-list"></div>
+    </div>
+  </div>
 
-        function triggerCookingAnimation() {
-            visualKoki.classList.add('cooking-active');
-            setTimeout(() => visualKoki.classList.remove('cooking-active'), 300);
-        }
+  <!-- TOAST -->
+  <div id="toast"></div>
 
-        // UPGRADE SYSTEM (GOLDEN RATIO 1.15x MULTIPLIER)
-        function upgrade(type) {
-            if (type === 'koki' && player.money >= player.kokiCost) {
-                player.money -= player.kokiCost;
-                player.kokiLevel++;
-                player.kokiCost = Math.floor(player.kokiCost * 1.2);
-            } else if (type === 'lift' && player.money >= player.liftCost) {
-                player.money -= player.liftCost;
-                player.liftLevel++;
-                player.liftCost = Math.floor(player.liftCost * 1.2);
-            } else if (type === 'dining' && player.money >= player.diningCost) {
-                player.money -= player.diningCost;
-                player.diningLevel++;
-                player.diningCost = Math.floor(player.diningCost * 1.2);
-            }
-            refreshUI();
-            saveGame();
-        }
+  <!-- MODAL PRESTIGE -->
+  <div id="modal-bg">
+    <div id="modal">
+      <h2 id="modal-title">Buka Cabang?</h2>
+      <p id="modal-body"></p>
+      <div class="modal-btns">
+        <button id="modal-cancel" onclick="closeModal()">Batal</button>
+        <button id="modal-ok" onclick="confirmPrestige()">Buka! 🎉</button>
+      </div>
+    </div>
+  </div>
 
-        // AUTOMATION HEARTBEAT LOOP (Siklus Kerja Otomatis)
-        setInterval(() => {
-            let actualMultiplier = player.globalMultiplier * systemMultiplier;
+</div>
 
-            // 1. Dapur otomatis jika level koki >= 3
-            if (player.kokiLevel >= 3) {
-                player.stockAtDapur += (getCookPower() * 0.5 * systemMultiplier); 
-                visualKoki.classList.add('cooking-active');
-            } else {
-                visualKoki.classList.remove('cooking-active');
-            }
+<script>
+// ╔══════════════════════════════════════╗
+// ║          GAME STATE                  ║
+// ╚══════════════════════════════════════╝
+const SAVE_KEY = 'warmindoTycoon_v2';
+const DEF = {
+  money:0, cabangId:1, cabangName:'Sukamulya', globalMult:1,
+  prestigeCount:0,
+  kokiLv:1, kokiCost:50,
+  liftLv:1, liftCost:80,
+  diningLv:1, diningCost:100,
+  marketingLv:1, marketingCost:200,
+  stockDapur:0, stockLift:0, stockDining:0,
+  totalEarned:0, totalTaps:0,
+  achUnlocked:[]
+};
+let g = Object.assign({}, DEF);
 
-            // 2. Pergerakan Otomatis Lift Logistik (Naik-Turun)
-            let maxCapacity = getMaxLiftCapacity();
-            if (liftPosition === "top") {
-                // Ambil piring dari dapur
-                if (player.stockAtDapur > 0 && player.stockAtLift < maxCapacity) {
-                    let spaceLeft = maxCapacity - player.stockAtLift;
-                    let toLoad = Math.min(spaceLeft, player.stockAtDapur);
-                    player.stockAtDapur -= toLoad;
-                    player.stockAtLift += toLoad;
-                }
-                // Turun ke bawah
-                liftPosition = "bottom";
-                visualLift.style.top = "80%";
-            } else {
-                // Bongkar piring di area makan lantai 1
-                if (player.stockAtLift > 0) {
-                    player.stockAtDining += player.stockAtLift;
-                    player.stockAtLift = 0;
-                }
-                // Naik ke atas
-                liftPosition = "top";
-                visualLift.style.top = "5px";
-            }
+// Runtime (not saved)
+let sysBoost = 1;
+let boostTimer = 0;
+let liftUp = true; // true = going to pick up, false = going to deliver
+let perSec = 0;
+let modalData = {};
+let lastTick = Date.now();
 
-            // 3. Area Makan Lantai 1 Melakukan Penjualan Cuan
-            if (player.stockAtDining > 0) {
-                let piringDimakan = Math.min(player.stockAtDining, 2 * systemMultiplier);
-                player.stockAtDining -= piringDimakan;
-                player.money += (piringDimakan * getFoodPrice() * actualMultiplier);
-            }
+// ── FORMULAS ──
+const cookPower   = () => g.kokiLv;
+const liftCap     = () => g.liftLv * 5;
+const foodPrice   = () => g.diningLv * 10;
+const autoEnabled = () => g.kokiLv >= 5;
+const customerRate= () => g.marketingLv * 0.5;
+const TICK = 1500;
 
-            refreshUI();
-        }, 1500); // Eksekusi cycle setiap 1.5 detik agar gerakan lift visual nyaman dilihat
+// ── FORMAT ──
+function rp(n){
+  n=Math.floor(n);
+  if(n>=1e9) return 'Rp '+(n/1e9).toFixed(2)+'M';
+  if(n>=1e6) return 'Rp '+(n/1e6).toFixed(2)+'jt';
+  if(n>=1e3) return 'Rp '+n.toLocaleString('id-ID');
+  return 'Rp '+n;
+}
 
-        // PRESTIGE SYSTEM (BUKA CABANG BARU)
-        function bukaCabang(id, cost, mult, name) {
-            if (player.money >= cost && player.currentCabangId < id) {
-                // Amankan Multiplier Baru
-                let targetMult = mult;
-                
-                // Reset State Game dari awal template
-                player = Object.assign({}, saveTemplate);
-                
-                // Terapkan Bonus Hasil Ekspansi
-                player.currentCabangId = id;
-                player.currentCabangName = name;
-                player.globalMultiplier = targetMult;
-                player.money = 0; // Mulai dari nol logis
+// ══════════════════════════════════════
+//  SAVE / LOAD
+// ══════════════════════════════════════
+function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(g));}
+function load(){
+  const d=localStorage.getItem(SAVE_KEY);
+  if(d) try{g=Object.assign({},DEF,JSON.parse(d));}catch(e){}
+}
 
-                alert(`Selamat! Cabang ${name} Resmi Dibuka! Nikmati bonus pendapatan permanen ${mult}x lipat!`);
-                switchTab('upgrade');
-                refreshUI();
-                saveGame();
-            }
-        }
+// ══════════════════════════════════════
+//  UI REFRESH
+// ══════════════════════════════════════
+function refreshAll(){
+  document.getElementById('money-val').textContent=rp(g.money);
+  document.getElementById('cabang-name').textContent=`CABANG ${g.cabangId} — ${g.cabangName.toUpperCase()}`;
+  document.getElementById('tag-mult').textContent=`${g.globalMult * sysBoost}×`;
+  if(g.prestigeCount>0){document.getElementById('tag-prestige').style.display='inline-block';}
+  document.getElementById('total-level').textContent=g.kokiLv+g.liftLv+g.diningLv+g.marketingLv-3;
 
-        // SIMULASI MONETISASI REWARDED ADS
-        function putarIklan() {
-            btnBooster.disabled = true;
-            btnBooster.innerText = "🎬 MEMUTAR IKLAN (5s)...";
-            
-            setTimeout(() => {
-                systemMultiplier = 2; // Naikkan speed/pendapatan 2x lipat
-                btnBooster.innerText = "🚀 TURBO BOOST AKTIF (2X SPEED) - 30s";
-                refreshUI();
+  // Stocks
+  document.getElementById('st-dapur').textContent=Math.floor(g.stockDapur)+' piring';
+  document.getElementById('st-dining').textContent=Math.floor(g.stockDining)+' porsi';
+  document.getElementById('per-sec').textContent='+'+rp(perSec)+'/dtk';
+  document.getElementById('dining-rate').textContent='+'+rp(foodPrice()*Math.min(g.stockDining,2*sysBoost)*g.globalMult*sysBoost)+'/siklus';
 
-                // Timer hitung mundur booster selesai
-                setTimeout(() => {
-                    systemMultiplier = 1;
-                    btnBooster.disabled = false;
-                    btnBooster.innerText = "🎬 TONTON IKLAN (SPEED BOOSTER 2X)";
-                    refreshUI();
-                }, 30000);
+  // Lift label
+  document.getElementById('lift-label').textContent=Math.floor(g.stockLift)+'/'+liftCap();
 
-            }, 5000);
-        }
+  // Koki animation
+  const kicon=document.getElementById('icon-koki');
+  if(autoEnabled()||g.stockDapur>0) kicon.classList.add('active'); else kicon.classList.remove('active');
 
-        // FITUR LOCAL STORAGE AUTO-SAVE
-        function saveGame() {
-            localStorage.setItem('warmindoTycoonMasterSave', JSON.stringify(player));
-        }
+  // Tap button visibility
+  document.getElementById('btn-tap-koki').className='fp-tap'+(autoEnabled()?' disabled':'');
+  document.getElementById('btn-tap-koki').disabled=autoEnabled();
 
-        function loadGame() {
-            const dataStr = localStorage.getItem('warmindoTycoonMasterSave');
-            if (dataStr) {
-                player = JSON.parse(dataStr);
-            }
-        }
+  // Upgrade cards
+  refreshUpgradeCard('koki','Koki & Kompor',g.kokiLv,g.kokiCost,10,
+    g.kokiLv<5?`Tap masak +${cookPower()} piring`:`🤖 AUTO masak +${cookPower()*0.5}/dtk`);
+  refreshUpgradeCard('lift','Kapasitas Lift',g.liftLv,g.liftCost,10,
+    `Angkut maks ${liftCap()} piring/trip`);
+  refreshUpgradeCard('dining','Fasilitas Meja',g.diningLv,g.diningCost,10,
+    `Harga jual ${rp(foodPrice())}/porsi`);
+  refreshUpgradeCard('marketing','Spanduk & Promosi',g.marketingLv,g.marketingCost,8,
+    `${customerRate().toFixed(1)} pelanggan/dtk`);
 
-        // Booting awal game
-        loadGame();
-        refreshUI();
-    </script>
+  // Prestige buttons
+  const b2=document.getElementById('btn-cab2');
+  const b3=document.getElementById('btn-cab3');
+  const b4=document.getElementById('btn-cab4');
+  if(b2){b2.disabled=g.money<5000||g.cabangId>=2;}
+  if(b3){b3.disabled=g.money<50000||g.cabangId>=3;}
+  if(b4){b4.disabled=g.money<500000||g.cabangId>=4;}
+
+  // Achievements
+  checkAchievements();
+}
+
+function refreshUpgradeCard(key,name,lv,cost,maxLv,desc){
+  const maxed=lv>=maxLv;
+  document.getElementById(`u-${key}-name`).textContent=`${name} — Lv ${lv}`;
+  document.getElementById(`u-${key}-desc`).textContent=desc;
+  document.getElementById(`u-${key}-cost`).textContent=maxed?'MAX':rp(cost);
+  const btn=document.getElementById(`btn-u-${key}`);
+  btn.disabled=maxed||g.money<cost;
+  if(maxed){btn.className='upg-btn maxed';}else{btn.className='upg-btn';}
+  // pip bars
+  const bars=document.getElementById(`u-${key}-bars`);
+  bars.innerHTML='';
+  for(let i=0;i<maxLv;i++){
+    const d=document.createElement('div');
+    d.className='upg-pip'+(i<lv?' filled':'');
+    bars.appendChild(d);
+  }
+}
+
+// ══════════════════════════════════════
+//  TAP KOKI
+// ══════════════════════════════════════
+function tapKoki(){
+  if(autoEnabled()) return;
+  g.stockDapur+=cookPower();
+  g.totalTaps++;
+  spawnRipple(document.getElementById('btn-tap-koki'));
+  const koki=document.getElementById('icon-koki');
+  koki.style.transform='scale(1.4) rotate(-10deg)';
+  setTimeout(()=>koki.style.transform='',200);
+  refreshAll();
+  save();
+}
+
+function spawnRipple(el){
+  const r=el.getBoundingClientRect();
+  const world=document.getElementById('world').getBoundingClientRect();
+  const rip=document.createElement('div');
+  rip.className='ripple';
+  rip.style.left=(r.left-world.left+r.width/2)+'px';
+  rip.style.top=(r.top-world.top+r.height/2)+'px';
+  document.getElementById('world').appendChild(rip);
+  setTimeout(()=>rip.remove(),600);
+}
+
+// ══════════════════════════════════════
+//  UPGRADE
+// ══════════════════════════════════════
+function doUpgrade(key){
+  const maxes={koki:10,lift:10,dining:10,marketing:8};
+  const costKey=key+'Cost'; const lvKey=key+'Lv';
+  if(g[lvKey]>=maxes[key]) return;
+  if(g.money<g[costKey]) return;
+  g.money-=g[costKey];
+  g[lvKey]++;
+  g[costKey]=Math.floor(g[costKey]*1.25);
+  showToast('✅ '+key.charAt(0).toUpperCase()+key.slice(1)+' diupgrade ke Lv '+g[lvKey]+'!');
+  refreshAll();
+  save();
+}
+
+// ══════════════════════════════════════
+//  MAIN GAME LOOP (1.5s tick)
+// ══════════════════════════════════════
+setInterval(()=>{
+  const mult=g.globalMult*sysBoost;
+
+  // 1. AUTO COOK (koki lv 5+)
+  if(autoEnabled()){
+    g.stockDapur+=cookPower()*0.5*sysBoost;
+  }
+
+  // 2. LIFT LOGIC
+  const cap=liftCap();
+  if(liftUp){
+    // Pick up from dapur
+    if(g.stockDapur>0){
+      const space=cap-g.stockLift;
+      const take=Math.min(space,Math.floor(g.stockDapur));
+      g.stockDapur-=take;
+      g.stockLift+=take;
+    }
+    // Move down
+    moveLift('down');
+    liftUp=false;
+  } else {
+    // Deliver to dining
+    if(g.stockLift>0){
+      g.stockDining+=g.stockLift;
+      g.stockLift=0;
+    }
+    // Move up
+    moveLift('up');
+    liftUp=true;
+  }
+
+  // 3. DINING SELLS
+  let income=0;
+  if(g.stockDining>0){
+    const eat=Math.min(g.stockDining,2*sysBoost*g.marketingLv*0.5);
+    g.stockDining-=eat;
+    income=eat*foodPrice()*mult;
+    g.money+=income;
+    g.totalEarned+=income;
+    if(income>0) spawnIncomePop(income);
+  }
+
+  // Per sec estimate
+  perSec=income/(TICK/1000);
+
+  // Boost timer countdown
+  if(boostTimer>0){
+    boostTimer--;
+    document.getElementById('boost-timer').textContent='Aktif: '+boostTimer+'s';
+    if(boostTimer<=0){
+      sysBoost=1;
+      document.getElementById('boost-timer').style.display='none';
+      document.getElementById('btn-boost').disabled=false;
+      document.getElementById('btn-boost').textContent='🎬 TONTON IKLAN';
+      showToast('⚡ Speed Boost selesai!');
+    }
+  }
+
+  refreshAll();
+  save();
+},TICK);
+
+// Smoke animation
+setInterval(()=>{
+  if(!autoEnabled()) return;
+  const smokes=['smoke1','smoke2','smoke3'];
+  smokes.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.style.opacity='0.6';
+    setTimeout(()=>{if(el)el.style.opacity='0';},600+i*200);
+  });
+},2000);
+
+// ── LIFT VISUAL ──
+function moveLift(dir){
+  const car=document.getElementById('lift-car');
+  // Ruko is 320 tall SVG, lift shaft from ~90 to ~300
+  // We map floor positions inside the rendered ruko div
+  const ruko=document.getElementById('ruko');
+  const h=ruko.offsetHeight;
+  const topPos=Math.floor(h*0.28); // dapur level
+  const botPos=Math.floor(h*0.70); // dining level
+  car.style.top=(dir==='up'?topPos:botPos)+'px';
+}
+
+// ── INCOME POPUP ──
+function spawnIncomePop(amount){
+  const world=document.getElementById('world');
+  const pop=document.createElement('div');
+  pop.className='income-pop';
+  pop.textContent='+'+rp(amount);
+  pop.style.left=(80+Math.random()*80)+'px';
+  pop.style.bottom=(80+Math.random()*40)+'px';
+  world.appendChild(pop);
+  setTimeout(()=>pop.remove(),1300);
+}
+
+// ── CUSTOMERS (visual) ──
+const EMOJIS=['🧑','👩','👦','👴','👩‍🦱','🧔','👩‍🦳','🧑‍🦲'];
+function spawnCustomer(){
+  const lane=document.getElementById('customer-lane');
+  const c=document.createElement('div');
+  c.className='customer';
+  c.textContent=EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+  const dur=4+Math.random()*4;
+  c.style.animationDuration=dur+'s';
+  c.style.animationDelay=(Math.random()*2)+'s';
+  lane.appendChild(c);
+  setTimeout(()=>c.remove(),(dur+3)*1000);
+}
+setInterval(()=>{
+  if(Math.random()<customerRate()/5) spawnCustomer();
+},1000);
+
+// ══════════════════════════════════════
+//  PRESTIGE / CABANG
+// ══════════════════════════════════════
+function openPrestigeModal(id,cost,mult,name){
+  if(g.money<cost||g.cabangId>=id) return;
+  modalData={id,cost,mult,name};
+  document.getElementById('modal-title').textContent='Buka Cabang '+name+'?';
+  document.getElementById('modal-body').textContent=
+    `Kamu akan membayar ${rp(cost)} dan me-reset semua progress ruko saat ini. Sebagai gantinya, kamu mendapat bonus pendapatan permanen ${mult}× untuk selamanya!`;
+  document.getElementById('modal-bg').classList.add('open');
+}
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
+function confirmPrestige(){
+  const {id,cost,mult,name}=modalData;
+  closeModal();
+  g=Object.assign({},DEF);
+  g.cabangId=id;
+  g.cabangName=name;
+  g.globalMult=mult;
+  g.prestigeCount++;
+  showToast('🎉 Cabang '+name+' resmi dibuka! Bonus '+mult+'×!');
+  switchTab('upgrade',document.querySelector('.tab'));
+  refreshAll();
+  save();
+}
+
+// ══════════════════════════════════════
+//  BOOSTERS
+// ══════════════════════════════════════
+function watchAd(){
+  const btn=document.getElementById('btn-boost');
+  btn.disabled=true;
+  btn.textContent='🎬 Memutar iklan... 5s';
+  let c=5;
+  const iv=setInterval(()=>{
+    c--;
+    btn.textContent='🎬 Memutar iklan... '+c+'s';
+    if(c<=0){
+      clearInterval(iv);
+      sysBoost=2;
+      boostTimer=30;
+      const timer=document.getElementById('boost-timer');
+      timer.style.display='block';
+      timer.textContent='Aktif: 30s';
+      showToast('⚡ Speed Boost 2× aktif 30 detik!');
+      refreshAll();
+    }
+  },1000);
+}
+function watchAd2(){
+  const btn=document.getElementById('btn-boost2');
+  btn.disabled=true;
+  btn.textContent='Memutar... 5s';
+  let c=5;
+  const iv=setInterval(()=>{
+    c--;
+    btn.textContent='Memutar... '+c+'s';
+    if(c<=0){
+      clearInterval(iv);
+      const bonus=Math.max(500, Math.floor(g.money*0.05));
+      g.money+=bonus;
+      g.totalEarned+=bonus;
+      showToast('💰 Bonus +'+rp(bonus)+' diterima!');
+      btn.textContent='🎬 TONTON IKLAN BONUS';
+      const timer=document.getElementById('boost-timer2');
+      timer.style.display='block';
+      timer.textContent='Cooldown 60s...';
+      let cd=60;
+      const iv2=setInterval(()=>{
+        cd--;
+        timer.textContent='Cooldown '+cd+'s...';
+        if(cd<=0){clearInterval(iv2);timer.style.display='none';btn.disabled=false;}
+      },1000);
+      refreshAll();
+    }
+  },1000);
+}
+
+// ══════════════════════════════════════
+//  ACHIEVEMENTS
+// ══════════════════════════════════════
+const ACHIEVEMENTS=[
+  {id:'first_tap',icon:'👆',name:'Tangan Pertama',desc:'Tap koki pertama kali',check:()=>g.totalTaps>=1},
+  {id:'earn_1000',icon:'💰',name:'Seribu Rupiah!',desc:'Kumpulkan Rp 1.000',check:()=>g.totalEarned>=1000},
+  {id:'earn_10k',icon:'💵',name:'Uang Jajan',desc:'Kumpulkan Rp 10.000',check:()=>g.totalEarned>=10000},
+  {id:'earn_100k',icon:'🤑',name:'Juragan Mie',desc:'Kumpulkan Rp 100.000',check:()=>g.totalEarned>=100000},
+  {id:'koki_5',icon:'🤖',name:'Koki Robot',desc:'Upgrade Koki ke Lv 5 (auto masak!)',check:()=>g.kokiLv>=5},
+  {id:'koki_max',icon:'👨‍🍳',name:'Masterchef',desc:'Koki mencapai level maksimal',check:()=>g.kokiLv>=10},
+  {id:'prestige1',icon:'🌟',name:'Ekspansi Pertama',desc:'Buka cabang pertama',check:()=>g.prestigeCount>=1},
+  {id:'prestige3',icon:'🏙️',name:'Raja Warmindo',desc:'Buka 3 cabang berbeda',check:()=>g.prestigeCount>=3},
+  {id:'tap_100',icon:'💪',name:'Jari Besi',desc:'Tap koki 100 kali',check:()=>g.totalTaps>=100},
+];
+
+function checkAchievements(){
+  ACHIEVEMENTS.forEach(a=>{
+    if(!g.achUnlocked.includes(a.id)&&a.check()){
+      g.achUnlocked.push(a.id);
+      showToast('🏆 Trofi: '+a.name+'!');
+      save();
+    }
+  });
+  renderAchievements();
+}
+
+function renderAchievements(){
+  const list=document.getElementById('ach-list');
+  list.innerHTML='';
+  ACHIEVEMENTS.forEach(a=>{
+    const unlocked=g.achUnlocked.includes(a.id);
+    const d=document.createElement('div');
+    d.className='ach-card'+(unlocked?'':' locked');
+    d.innerHTML=`<div class="ach-icon">${a.icon}</div>
+      <div class="ach-info">
+        <div class="ach-name">${a.name}</div>
+        <div class="ach-desc">${a.desc}</div>
+      </div>
+      ${unlocked?'<div class="ach-badge">✓ DAPAT</div>':''}`;
+    list.appendChild(d);
+  });
+}
+
+// ══════════════════════════════════════
+//  TAB SWITCHING
+// ══════════════════════════════════════
+function switchTab(name, btn){
+  ['upgrade','prestige','boost','ach'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('hidden', t!==name);
+  });
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(name==='ach') renderAchievements();
+}
+
+// ══════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ══════════════════════════════════════
+//  HIDDEN CLASS
+// ══════════════════════════════════════
+const style=document.createElement('style');
+style.textContent='.hidden{display:none!important;}';
+document.head.appendChild(style);
+
+// ══════════════════════════════════════
+//  BOOT
+// ══════════════════════════════════════
+load();
+refreshAll();
+moveLift('up');
+
+// Initial customers
+setTimeout(()=>{spawnCustomer();spawnCustomer();},1000);
+</script>
 </body>
 </html>
