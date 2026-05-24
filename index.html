@@ -13,272 +13,140 @@
   --bg:#1a0a00;--panel:#2d1500;--panel2:#3d2010;--panel3:#4e2d18;
   --text:#fff;--muted:#c4a882;--border:#6b3d1e;
   --sky:#87CEEB;--sky2:#4a90d9;--ground:#5D4037;
-  --wall:#8B6347;--wall2:#a0734f;--roof:#c0392b;--roof2:#e74c3c;
-  --floor1:#d4a96a;--floor2:#c49458;--window:#add8e6;--door:#8B4513;
+  --wall:#8B6347;--wall2:#a0734f;--roof:#c0392b;
 }
-html,body{width:100%;height:100%;overflow:hidden;background:#000;}
-#app{
-  width:100%;max-width:430px;height:100svh;
-  margin:0 auto;display:flex;flex-direction:column;
-  background:var(--bg);font-family:'Nunito',sans-serif;
-  position:relative;overflow:hidden;
+body{background-color:#110500;color:var(--text);font-family:'Nunito',sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;overflow:hidden;}
+#app{width:100%;max-width:420px;height:100vh;background-color:var(--bg);position:relative;display:flex;flex-direction:column;box-shadow:0 0 20px rgba(0,0,0,0.8);}
+
+/* HUD */
+#hud{background:linear-gradient(180deg,var(--panel2),var(--panel));padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid var(--border);position:relative;z-index:10;}
+#hud-left{display:flex;flex-direction:column;gap:1px;}
+#cabang-name{font-size:10px;font-weight:900;color:var(--gold2);letter-spacing:1px;font-family:'Fredoka One',cursive;}
+#money-val{font-size:24px;font-weight:900;color:var(--gold);text-shadow:0 2px 4px rgba(0,0,0,0.5);font-family:'Fredoka One',cursive;}
+#per-sec{font-size:11px;font-weight:800;color:var(--green);margin-top:-2px;}
+#level-ring{background:linear-gradient(135deg,#3d2010,#1a0a00);border:2.5px solid var(--gold2);border-radius:50%;width:44px;height:44px;display:flex;flex-direction:column;justify-content:center;align-items:center;box-shadow:inset 0 0 5px rgba(0,0,0,0.6);}
+#level-ring .lv{font-size:7px;font-weight:900;color:var(--muted);letter-spacing:0.5px;line-height:1;}
+#level-ring .lv-num{font-size:15px;font-weight:900;color:#fff;font-family:'Fredoka One',cursive;line-height:1.1;}
+#hud-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.tag{background-color:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:12px;padding:2px 8px;font-size:10px;font-weight:800;color:var(--gold);}
+.tag-prestige{background:linear-gradient(135deg,var(--red),#b91c1c);color:#fff;border:none;font-weight:900;box-shadow:0 2px 4px rgba(0,0,0,0.3);animation:pulse 1.5s infinite;}
+
+/* WORLD */
+#world{flex:1;position:relative;background:linear-gradient(180deg,var(--sky),var(--sky2) 75%,var(--ground) 75%);overflow:hidden;}
+#ruko{position:absolute;bottom:25%;left:10px;width:260px;height:320px;z-index:2;}
+#ruko-svg{width:100%;height:100%;display:block;}
+
+/* ANIMASI ASAP */
+#smoke1,#smoke2,#smoke3{animation:smokeAnim 2.5s infinite linear;}
+#smoke2{animation-delay:0.8s;}
+#smoke3{animation-delay:1.6s;}
+@keyframes smokeAnim{
+  0%{transform:translateY(0) scale(0.8);opacity:0;}
+  20%{opacity:0.5;}
+  60%{opacity:0.3;}
+  100%{transform:translateY(-30px) scale(1.5);opacity:0;}
 }
 
-/* ── TOP HUD ── */
-#hud{
-  background:linear-gradient(180deg,#1a0a00 0%,#2d1500 100%);
-  border-bottom:2px solid var(--gold);
-  padding:8px 12px 6px;flex-shrink:0;
-  display:flex;align-items:center;gap:8px;
-}
-#hud-left{flex:1;}
-#cabang-name{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;}
-#money-val{font-family:'Fredoka One',cursive;font-size:26px;color:var(--gold);line-height:1;}
-#per-sec{font-size:10px;color:var(--green);font-weight:700;}
-#hud-right{text-align:right;}
-.tag{display:inline-block;background:var(--gold);color:#1a0000;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;}
-.tag-prestige{background:#a855f7;color:#fff;margin-left:4px;}
-#level-ring{
-  width:44px;height:44px;border-radius:50%;
-  border:3px solid var(--gold);background:var(--panel2);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-#level-ring .lv{font-size:8px;color:var(--muted);line-height:1;}
-#level-ring .lv-num{font-family:'Fredoka One',cursive;font-size:18px;color:var(--gold);line-height:1;}
+#lift-car{position:absolute;right:22px;width:24px;height:24px;background:linear-gradient(135deg,#e2e8f0,#cbd5e1);border:1.5px solid #64748b;border-radius:3px;z-index:3;display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:10px;box-shadow:0 2px 4px rgba(0,0,0,0.3);transition:top 1.4s cubic-bezier(0.45, 0, 0.55, 1);}
+#lift-label{position:absolute;top:-10px;background-color:#1e293b;color:#fff;font-size:7px;font-weight:900;padding:1px 3px;border-radius:3px;border:0.5px solid #475569;}
 
-/* ── GAME WORLD ── */
-#world{
-  flex:1;position:relative;overflow:hidden;
-  background:linear-gradient(180deg,#87CEEB 0%,#c9e8ff 60%,#a8d8a8 60%,#5D4037 100%);
-}
+.floor-panel{position:absolute;right:64px;width:150px;height:42px;background:linear-gradient(90deg,rgba(45,21,0,0.85),rgba(26,10,0,0.9));border:2px solid var(--border);border-radius:8px;display:flex;align-items:center;padding:0 6px;gap:6px;z-index:4;box-shadow:0 3px 6px rgba(0,0,0,0.4);}
+.fp-icon{font-size:18px;filter:grayscale(1);transition:filter 0.3s,transform 0.2s;}
+.fp-icon.active{filter:grayscale(0);animation:float 2s infinite ease-in-out;}
+.fp-bar{flex:1;display:flex;flex-direction:column;justify-content:center;}
+.fp-label{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+.fp-stock{font-size:12px;font-weight:900;color:#fff;}
+.fp-tap{background:linear-gradient(180deg,#ffeb3b,#fbc02d);border:none;border-bottom:3px solid #f57f17;border-radius:6px;color:#5d4037;font-family:'Fredoka One',cursive;font-size:9px;padding:5px 8px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.2);text-shadow:0 1px 0 rgba(255,255,255,0.4);transition:transform 0.05s;}
+.fp-tap:active{transform:translateY(2px);border-bottom-width:1px;}
+.fp-tap.disabled{background:linear-gradient(180deg,#94a3b8,#64748b);border-bottom:3px solid #475569;color:#cbd5e1;cursor:default;pointer-events:none;}
 
-/* CLOUDS */
-.cloud{position:absolute;opacity:.85;}
-.cloud svg{display:block;}
-@keyframes drift{from{transform:translateX(0)}to{transform:translateX(460px)}}
+#customer-lane{position:absolute;bottom:0;left:0;width:100%;height:25%;overflow:hidden;z-index:5;}
+.customer{position:absolute;bottom:10px;left:-30px;font-size:24px;animation:walk linear forwards;}
 
-/* RUKO BUILDING */
-#ruko{
-  position:absolute;bottom:0;left:50%;transform:translateX(-50%);
-  width:260px;
-}
-#ruko-svg{display:block;width:100%;overflow:visible;}
-
-/* LIFT TRACK */
-#lift-track{
-  position:absolute;right:0;top:0;bottom:0;width:36px;
-  display:flex;flex-direction:column;align-items:center;
-}
-#lift-car{
-  position:absolute;width:30px;height:30px;
-  background:#FFD700;border:2px solid #b8860b;border-radius:5px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:14px;transition:top 0.6s cubic-bezier(.4,0,.2,1);
-  box-shadow:0 2px 8px rgba(0,0,0,.4);
-  left:3px;
-}
-#lift-label{
-  position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);
-  font-size:8px;font-weight:800;color:#0f172a;white-space:nowrap;
-  background:var(--gold);padding:1px 4px;border-radius:3px;
-}
-
-/* FLOOR PANELS overlaid on SVG */
-.floor-panel{
-  position:absolute;left:20px;right:46px;
-  background:rgba(0,0,0,.3);border-radius:6px;
-  padding:4px 6px;display:flex;align-items:center;gap:6px;
-}
-.fp-icon{font-size:18px;animation:none;flex-shrink:0;}
-.fp-icon.active{animation:bob 0.5s infinite alternate;}
-@keyframes bob{from{transform:translateY(0) rotate(-5deg)}to{transform:translateY(-4px) rotate(5deg)}}
-.fp-bar{flex:1;}
-.fp-label{font-size:9px;color:rgba(255,255,255,.7);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
-.fp-stock{font-size:12px;color:#fff;font-weight:800;line-height:1.1;}
-.fp-tap{
-  background:var(--gold);color:#1a0000;border:none;
-  font-size:9px;font-weight:800;padding:4px 8px;border-radius:10px;
-  cursor:pointer;flex-shrink:0;font-family:'Nunito',sans-serif;
-  transition:transform .1s;
-}
-.fp-tap:active{transform:scale(.92);}
-.fp-tap.disabled{background:#555;color:#999;cursor:default;}
-
-/* CUSTOMER PARADE */
-#customer-lane{
-  position:absolute;bottom:4px;left:0;right:0;height:36px;
-  overflow:hidden;
-}
-.customer{
-  position:absolute;font-size:22px;
-  animation:walk linear infinite;
-  bottom:2px;
-}
-@keyframes walk{
-  from{transform:translateX(-40px) scaleX(-1);}
-  to{transform:translateX(440px) scaleX(-1);}
-}
-
-/* INCOME POPUP */
-.income-pop{
-  position:absolute;font-family:'Fredoka One',cursive;
-  font-size:14px;color:var(--green);
-  pointer-events:none;font-weight:bold;
-  text-shadow:0 1px 4px rgba(0,0,0,.5);
-  animation:float-up 1.2s ease-out forwards;
-}
-@keyframes float-up{
-  0%{opacity:1;transform:translateY(0) scale(1);}
-  80%{opacity:1;transform:translateY(-40px) scale(1.1);}
-  100%{opacity:0;transform:translateY(-60px) scale(.8);}
-}
-
-/* TAP RIPPLE */
-.ripple{
-  position:absolute;border-radius:50%;
-  border:2px solid var(--gold);pointer-events:none;
-  animation:ripple-out .5s ease-out forwards;
-}
-@keyframes ripple-out{
-  from{width:10px;height:10px;opacity:1;margin:-5px;}
-  to{width:60px;height:60px;opacity:0;margin:-30px;}
-}
-
-/* ── BOTTOM TABS ── */
-#tabs{
-  display:flex;background:var(--panel);
-  border-top:2px solid var(--border);flex-shrink:0;
-}
-.tab{
-  flex:1;padding:8px 0 6px;background:none;border:none;
-  color:var(--muted);font-size:9px;font-weight:800;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-  letter-spacing:.5px;text-transform:uppercase;transition:color .2s;
-  font-family:'Nunito',sans-serif;
-}
-.tab-icon{font-size:18px;line-height:1;}
-.tab.active{color:var(--gold);}
-.tab.active .tab-icon{filter:drop-shadow(0 0 4px rgba(255,215,0,.6));}
-
-/* ── PANELS ── */
-#panel{
-  height:200px;background:var(--panel);
-  border-top:1px solid var(--border);
-  overflow-y:auto;flex-shrink:0;
-}
-#panel::-webkit-scrollbar{width:3px;}
-#panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
-
-.panel-section{padding:10px 12px;}
-.panel-title{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:8px;}
+/* TABS & PANEL */
+#tabs{background-color:var(--panel2);display:flex;border-top:3px solid var(--border);position:relative;z-index:10;}
+.tab{flex:1;background:none;border:none;border-bottom:4px solid transparent;color:var(--muted);font-family:'Fredoka One',cursive;font-size:11px;padding:12px 0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all 0.2s;}
+.tab-icon{font-size:14px;filter:grayscale(0.6);transition:filter 0.2s;}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);background-color:var(--panel);}
+.tab.active .tab-icon{filter:grayscale(0);}
+#panel{background-color:var(--panel);height:200px;border-top:1px solid rgba(255,255,255,0.05);padding:10px;overflow-y:auto;position:relative;z-index:9;}
+.panel-section{display:flex;flex-direction:column;gap:8px;}
+.panel-title{font-size:11px;font-weight:900;color:var(--muted);letter-spacing:1px;margin-bottom:2px;display:flex;align-items:center;gap:4px;}
 
 /* UPGRADE CARDS */
-.upg-card{
-  background:var(--panel2);border:1px solid var(--border);
-  border-radius:10px;padding:10px 12px;margin-bottom:8px;
-  display:flex;align-items:center;gap:10px;
-}
-.upg-icon{font-size:28px;flex-shrink:0;}
-.upg-info{flex:1;}
-.upg-name{font-size:13px;font-weight:800;color:#fff;}
-.upg-desc{font-size:10px;color:var(--muted);margin-top:2px;}
-.upg-bars{display:flex;gap:3px;margin-top:5px;}
-.upg-pip{width:14px;height:5px;border-radius:2px;background:var(--panel3);}
-.upg-pip.filled{background:var(--gold);}
-.upg-btn{
-  background:linear-gradient(135deg,var(--gold),var(--gold2));
-  color:#1a0000;border:none;padding:8px 12px;border-radius:8px;
-  font-weight:800;font-size:11px;cursor:pointer;flex-shrink:0;
-  font-family:'Nunito',sans-serif;transition:transform .1s,opacity .2s;
-  white-space:nowrap;
-}
-.upg-btn:active{transform:scale(.93);}
-.upg-btn:disabled{background:var(--panel3);color:#666;cursor:default;opacity:.7;}
-.upg-btn.maxed{background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;}
+.upg-card{background-color:var(--panel2);border:1.5px solid var(--border);border-radius:10px;padding:8px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 4px rgba(0,0,0,0.2);position:relative;overflow:hidden;}
+.upg-icon{font-size:22px;background-color:var(--panel3);width:40px;height:40px;border-radius:8px;display:flex;justify-content:center;align-items:center;border:1px solid rgba(255,255,255,0.05);}
+.upg-info{flex:1;display:flex;flex-direction:column;gap:1px;}
+.upg-name{font-size:12px;font-weight:900;color:#fff;}
+.upg-desc{font-size:10px;color:var(--muted);font-weight:600;}
+.upg-bars{display:flex;gap:2px;margin-top:3px;}
+.upg-pip{flex:1;height:4px;background-color:rgba(0,0,0,0.3);border-radius:1px;}
+.upg-pip.filled{background:linear-gradient(90deg,var(--gold2),var(--gold));box-shadow:0 0 2px var(--gold2);}
+.upg-btn{background:linear-gradient(180deg,var(--green),var(--green2));border:none;border-bottom:3px solid #145c32;border-radius:8px;color:#fff;font-family:'Fredoka One',cursive;font-size:11px;padding:8px 12px;min-width:85px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.2);display:flex;justify-content:center;align-items:center;transition:all 0.1s;}
+.upg-btn:active{transform:translateY(1px);border-bottom-width:1px;}
+.upg-btn:disabled{background:linear-gradient(180deg,#4e2d18,#2d1500);border-bottom:3px solid #1a0a00;color:var(--border);cursor:default;box-shadow:none;}
+.upg-btn.maxed{background:linear-gradient(135deg,#334155,#1e293b);border:none;color:#94a3b8;font-weight:900;}
 
-/* PRESTIGE PANEL */
-.prestige-card{
-  background:linear-gradient(135deg,#1a0030,#300050);
-  border:1px solid #a855f7;border-radius:12px;
-  padding:14px;margin-bottom:10px;
-}
-.prestige-title{font-family:'Fredoka One',cursive;font-size:16px;color:#d8b4fe;}
-.prestige-desc{font-size:11px;color:#c4b5fd;margin:4px 0 10px;}
-.prestige-btn{
-  width:100%;padding:10px;background:linear-gradient(135deg,#7c3aed,#a855f7);
-  color:#fff;border:none;border-radius:8px;font-weight:800;font-size:13px;
-  cursor:pointer;font-family:'Nunito',sans-serif;
-}
-.prestige-btn:disabled{opacity:.4;cursor:default;}
+/* PRESTIGE CARDS */
+.prestige-card{background:linear-gradient(135deg,var(--panel2),var(--panel3));border:2px dashed var(--border);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;margin-bottom:4px;box-shadow:0 3px 6px rgba(0,0,0,0.3);}
+.prestige-title{font-size:13px;font-weight:900;color:var(--gold);font-family:'Fredoka One',cursive;}
+.prestige-desc{font-size:10px;color:#e2e8f0;line-height:1.4;}
+.prestige-btn{background:linear-gradient(180deg,var(--blue),var(--blue2));border:none;border-bottom:3px solid #104466;border-radius:8px;color:#fff;font-family:'Fredoka One',cursive;font-size:12px;padding:8px 16px;cursor:pointer;box-shadow:0 3px 6px rgba(0,0,0,0.2);margin-top:4px;transition:all 0.1s;}
+.prestige-btn:active{transform:translateY(1px);border-bottom-width:1px;}
+.prestige-btn:disabled{background:linear-gradient(180deg,#4e2d18,#2d1500);border-bottom:none;color:var(--border);cursor:default;}
 
-/* ACHIEVEMENT CARD */
-.ach-card{
-  background:var(--panel2);border:1px solid var(--border);
-  border-radius:8px;padding:8px 12px;margin-bottom:6px;
-  display:flex;align-items:center;gap:10px;
-}
-.ach-icon{font-size:24px;}
-.ach-info .ach-name{font-size:12px;font-weight:800;color:#fff;}
-.ach-info .ach-desc{font-size:10px;color:var(--muted);}
-.ach-card.locked{opacity:.45;}
-.ach-badge{margin-left:auto;background:var(--gold);color:#1a0000;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;}
+/* BOOST CARDS */
+.boost-card{background:linear-gradient(135deg,#2c1a04,#4a2e0b);border:1.5px solid #d35400;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:4px;box-shadow:0 3px 6px rgba(0,0,0,0.3);position:relative;}
+.boost-title{font-size:14px;font-weight:900;color:#ff9f43;font-family:'Fredoka One',cursive;}
+.boost-desc{font-size:10px;color:var(--muted);font-weight:600;line-height:1.3;}
+.boost-btn{background:linear-gradient(180deg,#ff9f43,#ff6b6b);border:none;border-bottom:3px solid #b33939;border-radius:8px;color:#fff;font-family:'Fredoka One',cursive;font-size:11px;padding:8px 14px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.2);margin-top:4px;align-self:flex-start;}
+.boost-timer{position:absolute;top:12px;right:12px;background-color:rgba(0,0,0,0.5);border-radius:10px;padding:2px 8px;font-size:9px;font-weight:900;color:#ff6b6b;border:1px solid #ff6b6b;display:none;}
 
-/* BOOSTER CARD */
-.boost-card{
-  background:linear-gradient(135deg,#0d2d0d,#1a4a1a);
-  border:1px solid #2ECC71;border-radius:12px;padding:12px;margin-bottom:8px;
-}
-.boost-title{font-family:'Fredoka One',cursive;font-size:15px;color:#2ECC71;}
-.boost-desc{font-size:10px;color:#a8e6c0;margin:4px 0 10px;}
-.boost-btn{
-  width:100%;padding:10px;background:linear-gradient(135deg,#16a34a,#22c55e);
-  color:#fff;border:none;border-radius:8px;font-weight:800;font-size:13px;
-  cursor:pointer;font-family:'Nunito',sans-serif;
-}
-.boost-btn:disabled{opacity:.4;cursor:default;}
-.boost-timer{text-align:center;font-size:12px;color:#2ECC71;font-weight:800;margin-top:6px;display:none;}
+/* TROFI */
+#ach-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ach-card{background-color:var(--panel2);border:1.5px solid var(--border);border-radius:10px;padding:8px;display:flex;align-items:center;gap:8px;box-shadow:0 2px 4px rgba(0,0,0,0.2);position:relative;overflow:hidden;}
+.ach-card.locked{opacity:0.4;background-color:#1c0d02;border-style:dashed;}
+.ach-card.locked .ach-icon{filter:grayscale(1) blur(0.5px);}
+.ach-icon{font-size:20px;background-color:var(--panel3);width:36px;height:36px;border-radius:8px;display:flex;justify-content:center;align-items:center;}
+.ach-info{flex:1;display:flex;flex-direction:column;gap:1px;}
+.ach-name{font-size:10px;font-weight:900;color:#fff;}
+.ach-desc{font-size:8px;color:var(--muted);font-weight:600;line-height:1.1;}
+.ach-badge{position:absolute;top:0;right:0;background-color:var(--green2);color:#fff;font-size:6px;font-weight:900;padding:1px 4px;border-bottom-left-radius:5px;}
 
-/* NOTIFICATION TOAST */
-#toast{
-  position:absolute;top:70px;left:50%;transform:translateX(-50%);
-  background:rgba(0,0,0,.85);border:1px solid var(--gold);
-  color:#fff;font-size:12px;font-weight:700;padding:8px 16px;border-radius:20px;
-  opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:999;
-}
-#toast.show{opacity:1;}
+/* POPUPS & MODALS */
+#toast{position:absolute;top:75px;left:50%;transform:translateX(-50%) translateY(-20px);background:linear-gradient(135deg,#334155,#1e293b);border:1.5px solid #475569;padding:8px 16px;border-radius:20px;font-size:11px;font-weight:800;color:#fff;z-index:100;box-shadow:0 4px 10px rgba(0,0,0,0.5);pointer-events:none;opacity:0;transition:all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.income-pop{position:absolute;font-family:'Fredoka One',cursive;font-size:12px;font-weight:900;color:var(--gold);text-shadow:0 2px 4px rgba(0,0,0,0.8);z-index:6;pointer-events:none;animation:floatUpOut 1.3s ease-out forwards;}
+.ripple{position:absolute;width:40px;height:40px;background-color:rgba(255,235,59,0.25);border:2px solid rgba(255,235,59,0.5);border-radius:50%;z-index:1;transform:translate(-50%,-50%);pointer-events:none;animation:rippleOut 0.6s ease-out forwards;}
 
-/* MODAL */
-#modal-bg{
-  position:absolute;inset:0;background:rgba(0,0,0,.75);
-  display:none;align-items:center;justify-content:center;z-index:900;
-}
-#modal-bg.open{display:flex;}
-#modal{
-  background:var(--panel);border:2px solid var(--gold);border-radius:14px;
-  padding:20px;width:85%;max-width:320px;
-}
-#modal h2{font-family:'Fredoka One',cursive;color:var(--gold);font-size:18px;margin-bottom:8px;}
-#modal p{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5;}
-.modal-btns{display:flex;gap:8px;}
-.modal-btns button{
-  flex:1;padding:10px;border:none;border-radius:8px;font-weight:800;font-size:13px;
-  cursor:pointer;font-family:'Nunito',sans-serif;
-}
-#modal-ok{background:var(--gold);color:#1a0000;}
-#modal-cancel{background:var(--panel3);color:var(--muted);}
+#modal-bg{position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.75);z-index:200;display:flex;justify-content:center;align-items:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+#modal-bg.open{opacity:1;pointer-events:auto;}
+#modal{background-color:var(--panel2);border:3px solid var(--border);border-radius:16px;width:85%;max-width:320px;padding:16px;box-shadow:0 10px 25px rgba(0,0,0,0.6);display:flex;flex-direction:column;gap:12px;transform:scale(0.8);transition:transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);}
+#modal-bg.open #modal{transform:scale(1);}
+#modal-title{font-family:'Fredoka One',cursive;font-size:16px;color:var(--gold);text-align:center;}
+#modal-body{font-size:11px;color:#e2e8f0;text-align:center;line-height:1.4;font-weight:600;}
+.modal-btns{display:flex;gap:10px;margin-top:4px;}
+.modal-btns button{flex:1;border:none;font-family:'Fredoka One',cursive;font-size:12px;padding:10px 0;border-radius:8px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.2);transition:all 0.1s;}
+#modal-cancel{background-color:var(--panel3);color:var(--muted);border:1px solid var(--border);}
+#modal-cancel:active{background-color:var(--panel);}
+#modal-ok{background:linear-gradient(180deg,var(--green),var(--green2));border-bottom:3px solid #145c32;color:#fff;}
+#modal-ok:active{transform:translateY(1px);border-bottom-width:1px;}
 
-/* ── SCROLLBAR ── */
-#panel::-webkit-scrollbar-track{background:var(--panel);}
+/* ANIMATIONS */
+@keyframes walk{0%{left:-30px;}100%{left:110%;}}
+@keyframes floatUpOut{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-60px) scale(0.8);}}
+@keyframes rippleOut{0%{transform:translate(-50%,-50%) scale(0.2);opacity:1;}100%{transform:translate(-50%,-50%) scale(1.5);opacity:0;}}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
+@keyframes pulse{0%,100%{transform:scale(1);box-shadow:0 2px 4px rgba(0,0,0,0.3);}50%{transform:scale(1.04);box-shadow:0 4px 8px rgba(185,28,28,0.5);}}
+.hidden{display:none!important;}
 </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- HUD -->
   <div id="hud">
     <div id="hud-left">
-      <div id="cabang-name">CABANG 1 — SUKAMULYA</div>
+      <div id="cabang-name">CABANG 1 — KAMPUNG PALIS</div>
       <div id="money-val">Rp 0</div>
       <div id="per-sec">+Rp 0/dtk</div>
     </div>
@@ -292,85 +160,58 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;}
     </div>
   </div>
 
-  <!-- GAME WORLD -->
   <div id="world">
-
-    <!-- SVG RUKO -->
     <div id="ruko">
       <svg id="ruko-svg" viewBox="0 0 260 320" xmlns="http://www.w3.org/2000/svg">
-        <!-- Sky tint -->
-        <!-- Ground -->
         <rect x="0" y="300" width="260" height="20" fill="#5D4037"/>
-        <!-- Grass strip -->
         <rect x="0" y="296" width="260" height="8" fill="#4CAF50" rx="2"/>
-
-        <!-- BASEMENT / GROUND FLOOR (meja makan) -->
         <rect x="10" y="200" width="200" height="100" fill="#a0734f" rx="4"/>
-        <rect x="10" y="200" width="200" height="6" fill="#c49458"/><!-- ceiling line -->
-        <!-- Floor boards -->
+        <rect x="10" y="200" width="200" height="6" fill="#c49458"/>
         <rect x="10" y="288" width="200" height="12" fill="#8B6347"/>
-        <!-- Windows ground floor -->
         <rect x="20" y="215" width="35" height="28" fill="#add8e6" rx="2" opacity=".9"/>
         <rect x="30" y="215" width="1" height="28" fill="#fff" opacity=".4"/>
         <rect x="20" y="229" width="35" height="1" fill="#fff" opacity=".4"/>
         <rect x="70" y="215" width="35" height="28" fill="#add8e6" rx="2" opacity=".9"/>
         <rect x="80" y="215" width="1" height="28" fill="#fff" opacity=".4"/>
         <rect x="70" y="229" width="35" height="1" fill="#fff" opacity=".4"/>
-        <!-- Door -->
         <rect x="150" y="248" width="40" height="52" fill="#6D4C41" rx="3"/>
         <rect x="153" y="251" width="15" height="25" fill="#5D4037" rx="2"/>
         <rect x="171" y="251" width="15" height="25" fill="#5D4037" rx="2"/>
         <circle cx="168" cy="275" r="2.5" fill="#FFD700"/>
         <circle cx="182" cy="275" r="2.5" fill="#FFD700"/>
-        <!-- Signboard -->
         <rect x="15" y="202" width="130" height="18" fill="#D62828" rx="3"/>
         <text x="80" y="214" text-anchor="middle" font-family="Fredoka One,cursive" font-size="10" fill="#FFD700">WARMINDO BANG UDIN</text>
-
-        <!-- SECOND FLOOR (dapur) -->
         <rect x="10" y="100" width="200" height="100" fill="#b87d4f" rx="4"/>
         <rect x="10" y="100" width="200" height="5" fill="#d4a96a"/>
-        <rect x="10" y="194" width="200" height="6" fill="#8B6347"/><!-- divider -->
-        <!-- Windows 2nd floor -->
+        <rect x="10" y="194" width="200" height="6" fill="#8B6347"/>
         <rect x="20" y="115" width="35" height="28" fill="#add8e6" rx="2" opacity=".9"/>
         <rect x="30" y="115" width="1" height="28" fill="#fff" opacity=".4"/>
         <rect x="20" y="129" width="35" height="1" fill="#fff" opacity=".4"/>
         <rect x="70" y="115" width="35" height="28" fill="#fff8e1" rx="2" opacity=".8"/>
-        <!-- 2nd floor label -->
         <rect x="95" y="113" width="110" height="14" fill="#b91c1c" rx="2"/>
         <text x="150" y="123" text-anchor="middle" font-family="Fredoka One,cursive" font-size="8" fill="#fef08a">🍳 DAPUR PRODUKSI</text>
-
-        <!-- ROOF / ATTIC -->
         <polygon points="5,100 130,40 255,100" fill="#c0392b"/>
         <polygon points="15,100 130,50 245,100" fill="#e74c3c"/>
-        <!-- Roof ridge tile -->
         <rect x="120" y="39" width="20" height="8" fill="#c0392b" rx="2"/>
-        <!-- Chimney -->
         <rect x="55" y="48" width="18" height="38" fill="#8B6347" rx="2"/>
         <rect x="52" y="44" width="24" height="8" fill="#a0734f" rx="2"/>
-        <!-- Smoke from chimney (animated via JS) -->
+        
         <circle id="smoke1" cx="64" cy="40" r="5" fill="rgba(200,200,200,0.5)" opacity="0"/>
         <circle id="smoke2" cx="60" cy="28" r="7" fill="rgba(200,200,200,0.4)" opacity="0"/>
         <circle id="smoke3" cx="67" cy="18" r="6" fill="rgba(200,200,200,0.3)" opacity="0"/>
-
-        <!-- LIFT SHAFT (right side) -->
+        
         <rect x="215" y="90" width="34" height="215" fill="#1e293b" rx="4" opacity=".9"/>
         <rect x="218" y="93" width="28" height="209" fill="#0f172a" rx="3"/>
-        <!-- Shaft rails -->
         <line x1="226" y1="93" x2="226" y2="302" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4"/>
         <line x1="238" y1="93" x2="238" y2="302" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4"/>
-        <!-- Shaft label -->
         <text x="232" y="106" text-anchor="middle" font-family="Nunito,sans-serif" font-size="7" fill="#475569" font-weight="700">LIFT</text>
       </svg>
-
-      <!-- LIFT CAR overlaid -->
       <div id="lift-car" style="top:20px;">
         🍱
         <div id="lift-label">0</div>
       </div>
     </div>
 
-    <!-- FLOOR PANELS -->
-    <!-- Dapur (Floor 2) -->
     <div class="floor-panel" id="fp-dapur" style="bottom:172px;">
       <div class="fp-icon" id="icon-koki">👨‍🍳</div>
       <div class="fp-bar">
@@ -379,7 +220,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;}
       </div>
       <button class="fp-tap" id="btn-tap-koki" onclick="tapKoki()">TAP MASAK</button>
     </div>
-    <!-- Meja Makan (Floor 1) -->
     <div class="floor-panel" id="fp-dining" style="bottom:70px;">
       <div class="fp-icon">🍜</div>
       <div class="fp-bar">
@@ -389,141 +229,55 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;}
       <div style="font-size:9px;color:#2ECC71;font-weight:800;" id="dining-rate">Rp 0/dtk</div>
     </div>
 
-    <!-- CUSTOMER LANE -->
     <div id="customer-lane"></div>
-
-    <!-- CLOUDS -->
-    <div class="cloud" id="cloud1" style="top:8%;left:-120px;animation:drift 18s linear infinite;">
-      <svg width="100" height="40" viewBox="0 0 100 40"><ellipse cx="50" cy="28" rx="48" ry="16" fill="white" opacity=".9"/><ellipse cx="35" cy="22" rx="25" ry="18" fill="white" opacity=".9"/><ellipse cx="65" cy="20" rx="22" ry="16" fill="white" opacity=".9"/></svg>
-    </div>
-    <div class="cloud" id="cloud2" style="top:5%;left:-200px;animation:drift 26s linear infinite 8s;">
-      <svg width="75" height="30" viewBox="0 0 75 30"><ellipse cx="37" cy="20" rx="36" ry="12" fill="white" opacity=".7"/><ellipse cx="25" cy="16" rx="19" ry="14" fill="white" opacity=".7"/><ellipse cx="52" cy="14" rx="16" ry="12" fill="white" opacity=".7"/></svg>
-    </div>
   </div>
 
-  <!-- TABS -->
   <div id="tabs">
-    <button class="tab active" onclick="switchTab('upgrade',this)">
-      <div class="tab-icon">⬆️</div>UPGRADE
-    </button>
-    <button class="tab" onclick="switchTab('prestige',this)">
-      <div class="tab-icon">🗺️</div>CABANG
-    </button>
-    <button class="tab" onclick="switchTab('boost',this)">
-      <div class="tab-icon">🚀</div>BOOSTER
-    </button>
-    <button class="tab" onclick="switchTab('ach',this)">
-      <div class="tab-icon">🏆</div>TROFI
-    </button>
+    <button class="tab active" onclick="switchTab('upgrade',this)"><div class="tab-icon">⬆️</div>UPGRADE</button>
+    <button class="tab" onclick="switchTab('prestige',this)"><div class="tab-icon">🗺️</div>CABANG</button>
+    <button class="tab" onclick="switchTab('boost',this)"><div class="tab-icon">🚀</div>BOOSTER</button>
+    <button class="tab" onclick="switchTab('ach',this)"><div class="tab-icon">🏆</div>TROFI</button>
   </div>
 
-  <!-- PANEL -->
   <div id="panel">
-    <!-- UPGRADE -->
     <div class="panel-section" id="tab-upgrade">
       <div class="panel-title">🔧 UPGRADE RUKO</div>
-
-      <div class="upg-card">
-        <div class="upg-icon">👨‍🍳</div>
-        <div class="upg-info">
-          <div class="upg-name" id="u-koki-name">Koki & Kompor — Lv 1</div>
-          <div class="upg-desc" id="u-koki-desc">Tap untuk masak +1 piring</div>
-          <div class="upg-bars" id="u-koki-bars"></div>
-        </div>
-        <button class="upg-btn" id="btn-u-koki" onclick="doUpgrade('koki')">
-          <span id="u-koki-cost">Rp 50</span>
-        </button>
-      </div>
-
-      <div class="upg-card">
-        <div class="upg-icon">🛗</div>
-        <div class="upg-info">
-          <div class="upg-name" id="u-lift-name">Kapasitas Lift — Lv 1</div>
-          <div class="upg-desc" id="u-lift-desc">Angkut maks 5 piring/trip</div>
-          <div class="upg-bars" id="u-lift-bars"></div>
-        </div>
-        <button class="upg-btn" id="btn-u-lift" onclick="doUpgrade('lift')">
-          <span id="u-lift-cost">Rp 80</span>
-        </button>
-      </div>
-
-      <div class="upg-card">
-        <div class="upg-icon">🪑</div>
-        <div class="upg-info">
-          <div class="upg-name" id="u-dining-name">Fasilitas Meja — Lv 1</div>
-          <div class="upg-desc" id="u-dining-desc">Harga jual Rp 10/porsi</div>
-          <div class="upg-bars" id="u-dining-bars"></div>
-        </div>
-        <button class="upg-btn" id="btn-u-dining" onclick="doUpgrade('dining')">
-          <span id="u-dining-cost">Rp 100</span>
-        </button>
-      </div>
-
-      <div class="upg-card">
-        <div class="upg-icon">📣</div>
-        <div class="upg-info">
-          <div class="upg-name" id="u-marketing-name">Spanduk & Promosi — Lv 1</div>
-          <div class="upg-desc" id="u-marketing-desc">Pelanggan datang 1x/dtk</div>
-          <div class="upg-bars" id="u-marketing-bars"></div>
-        </div>
-        <button class="upg-btn" id="btn-u-marketing" onclick="doUpgrade('marketing')">
-          <span id="u-marketing-cost">Rp 200</span>
-        </button>
-      </div>
+      <div class="upg-card"><div class="upg-icon">👨‍🍳</div><div class="upg-info"><div class="upg-name" id="u-koki-name">Koki & Kompor — Lv 1</div><div class="upg-desc" id="u-koki-desc">Tap untuk masak +1 piring</div><div class="upg-bars" id="u-koki-bars"></div></div><button class="upg-btn" id="btn-u-koki" onclick="doUpgrade('koki')"><span id="u-koki-cost">Rp 50</span></button></div>
+      <div class="upg-card"><div class="upg-icon">🛗</div><div class="upg-info"><div class="upg-name" id="u-lift-name">Kapasitas Lift — Lv 1</div><div class="upg-desc" id="u-lift-desc">Angkut maks 5 piring/trip</div><div class="upg-bars" id="u-lift-bars"></div></div><button class="upg-btn" id="btn-u-lift" onclick="doUpgrade('lift')"><span id="u-lift-cost">Rp 80</span></button></div>
+      <div class="upg-card"><div class="upg-icon">🪑</div><div class="upg-info"><div class="upg-name" id="u-dining-name">Fasilitas Meja — Lv 1</div><div class="upg-desc" id="u-dining-desc">Harga jual Rp 10/porsi</div><div class="upg-bars" id="u-dining-bars"></div></div><button class="upg-btn" id="btn-u-dining" onclick="doUpgrade('dining')"><span id="u-dining-cost">Rp 100</span></button></div>
+      <div class="upg-card"><div class="upg-icon">📣</div><div class="upg-info"><div class="upg-name" id="u-marketing-name">Spanduk & Promosi — Lv 1</div><div class="upg-desc" id="u-marketing-desc">Pelanggan datang 1x/dtk</div><div class="upg-bars" id="u-marketing-bars"></div></div><button class="upg-btn" id="btn-u-marketing" onclick="doUpgrade('marketing')"><span id="u-marketing-cost">Rp 200</span></button></div>
     </div>
 
-    <!-- PRESTIGE / CABANG -->
     <div class="panel-section hidden" id="tab-prestige">
-      <div class="panel-title">🗺️ BUKA CABANG BARU</div>
-      <p style="font-size:10px;color:var(--muted);margin-bottom:10px;">Membuka cabang baru mereset progress, tapi memberi multiplier penghasilan permanen!</p>
-
-      <div class="prestige-card" id="pc-2">
-        <div class="prestige-title">Cabang 2 — Kresek 🏪</div>
-        <div class="prestige-desc">Butuh Rp 5.000 · Bonus 3× pendapatan permanen</div>
-        <button class="prestige-btn" id="btn-cab2" onclick="openPrestigeModal(2,5000,3,'Kresek')">Buka Cabang [Rp 5.000]</button>
-      </div>
-
-      <div class="prestige-card" id="pc-3">
-        <div class="prestige-title">Cabang 3 — Gading Serpong 🏬</div>
-        <div class="prestige-desc">Butuh Rp 50.000 · Bonus 16× pendapatan permanen</div>
-        <button class="prestige-btn" id="btn-cab3" onclick="openPrestigeModal(3,50000,16,'Gading Serpong')">Buka Cabang [Rp 50.000]</button>
-      </div>
-
-      <div class="prestige-card" id="pc-4">
-        <div class="prestige-title">Cabang 4 — BSD City 🏢</div>
-        <div class="prestige-desc">Butuh Rp 500.000 · Bonus 100× pendapatan permanen</div>
-        <button class="prestige-btn" id="btn-cab4" onclick="openPrestigeModal(4,500000,100,'BSD City')">Buka Cabang [Rp 500.000]</button>
-      </div>
+      <div class="panel-title">🗺️ EKSPANSI CABANG DUNIA</div>
+      <p style="font-size:10px;color:var(--muted);margin-bottom:10px;">Membuka cabang baru mereset progress ruko saat ini, tapi memberi multiplier pendapatan permanen yang dahsyat!</p>
+      
+      <div id="ach-list-prestige"></div>
     </div>
 
-    <!-- BOOSTER -->
     <div class="panel-section hidden" id="tab-boost">
       <div class="panel-title">🚀 BOOSTER</div>
       <div class="boost-card">
         <div class="boost-title">⚡ Speed Boost 2×</div>
-        <div class="boost-desc">Tonton iklan simulasi 5 detik. Semua produksi & penghasilan 2× lebih cepat selama 30 detik!</div>
+        <div class="boost-desc">Tonton iklan simulasi 5 detik. Semua produksi 2× lebih cepat selama 30 detik!</div>
         <button class="boost-btn" id="btn-boost" onclick="watchAd()">🎬 TONTON IKLAN</button>
         <div class="boost-timer" id="boost-timer">Aktif: 30s</div>
       </div>
       <div class="boost-card" style="background:linear-gradient(135deg,#0d1a2d,#1a2d4a);border-color:#3498DB;">
         <div class="boost-title" style="color:#3498DB;">💰 Bonus Uang Tunai</div>
-        <div class="boost-desc" style="color:#a8c8e8;">Tonton iklan bonus untuk mendapat langsung Rp 500 tunai!</div>
+        <div class="boost-desc" style="color:#a8c8e8;">Tonton iklan bonus untuk mendapat langsung hadiah tunai!</div>
         <button class="boost-btn" style="background:linear-gradient(135deg,#1a5c8a,#3498DB);" id="btn-boost2" onclick="watchAd2()">🎬 TONTON IKLAN BONUS</button>
         <div class="boost-timer" id="boost-timer2" style="color:#3498DB;"></div>
       </div>
     </div>
 
-    <!-- ACHIEVEMENTS -->
     <div class="panel-section hidden" id="tab-ach">
       <div class="panel-title">🏆 TROFI PENCAPAIAN</div>
       <div id="ach-list"></div>
     </div>
   </div>
 
-  <!-- TOAST -->
   <div id="toast"></div>
-
-  <!-- MODAL PRESTIGE -->
   <div id="modal-bg">
     <div id="modal">
       <h2 id="modal-title">Buka Cabang?</h2>
@@ -538,12 +292,24 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;}
 </div>
 
 <script>
-// ╔══════════════════════════════════════╗
-// ║          GAME STATE                  ║
-// ╚══════════════════════════════════════╝
-const SAVE_KEY = 'warmindoTycoon_v2';
+const SAVE_KEY = 'warmindoTycoon_v3';
+
+// DAFTAR 10 CABANG UTUH SAMPAI TINGKAT DUNIA
+const DAFTAR_CABANG = [
+  { id: 1, name: "Kampung Palis", cost: 0, mult: 1, desc: "Awal perjuangan di kampung halaman." },
+  { id: 2, name: "Pasar Ceplak", cost: 5000, mult: 3, desc: "Tantangan: Listrik pasar sering mati bergilir! (Ketuk koki saat padam)" },
+  { id: 3, name: "Ruko Mulya", cost: 75000, mult: 12, desc: "Tantangan: Ada potongan biaya operasional sewa ruko sebesar 5%." },
+  { id: 4, name: "Kabupaten Tangerang", cost: 1000000, mult: 50, desc: "Tantangan: Jam sibuk! Pelanggan datang bergerombol sangat cepat." },
+  { id: 5, name: "Kota Besar (Jakarta)", cost: 15000000, mult: 250, desc: "Tantangan: Banyak saingan warung lain, pelanggan datang agak lambat." },
+  { id: 6, name: "Area Elit (PIK)", cost: 200000000, mult: 1200, desc: "Tantangan: Warga elit ogah makan kalau level Fasilitas Meja di bawah Lv 5." },
+  { id: 7, name: "Negara Tetangga (Malaysia)", cost: 3000000000, mult: 7000, desc: "Tantangan: Kurs mata uang asing membuat biaya seluruh upgrade naik 2x lipat." },
+  { id: 8, name: "Pusat Trend (Korea Selatan)", cost: 50000000000, mult: 45000, desc: "Tantangan: Selera warga sangat cepat bosan, andalkan Speed Booster iklan!" },
+  { id: 9, name: "Kota Megapolitan (New York)", cost: 900000000000, mult: 300000, desc: "Tantangan: Suhu dingin ekstrem membuat koki memasak 30% lebih lambat." },
+  { id: 10, name: "Ekspansi Dunia (Global)", cost: 15000000000000, mult: 2000000, desc: "Tantangan Terakhir: Inflasi Dunia! Biaya super mahal namun untung melimpah!" }
+];
+
 const DEF = {
-  money:0, cabangId:1, cabangName:'Sukamulya', globalMult:1,
+  money:0, cabangId:1, cabangName:'Kampung Palis', globalMult:1,
   prestigeCount:0,
   kokiLv:1, kokiCost:50,
   liftLv:1, liftCost:80,
@@ -555,43 +321,33 @@ const DEF = {
 };
 let g = Object.assign({}, DEF);
 
-// Runtime (not saved)
 let sysBoost = 1;
 let boostTimer = 0;
-let liftUp = true; // true = going to pick up, false = going to deliver
+let liftUp = true; 
 let perSec = 0;
 let modalData = {};
-let lastTick = Date.now();
+let isMatiLampu = false;
 
-// ── FORMULAS ──
-const cookPower   = () => g.kokiLv;
-const liftCap     = () => g.liftLv * 5;
-const foodPrice   = () => g.diningLv * 10;
-const autoEnabled = () => g.kokiLv >= 5;
-const customerRate= () => g.marketingLv * 0.5;
-const TICK = 1500;
-
-// ── FORMAT ──
 function rp(n){
   n=Math.floor(n);
-  if(n>=1e9) return 'Rp '+(n/1e9).toFixed(2)+'M';
-  if(n>=1e6) return 'Rp '+(n/1e6).toFixed(2)+'jt';
+  if(n>=1e12) return 'Rp '+(n/1e12).toFixed(2)+' T';
+  if(n>=1e9) return 'Rp '+(n/1e9).toFixed(2)+' M';
+  if(n>=1e6) return 'Rp '+(n/1e6).toFixed(2)+' jt';
   if(n>=1e3) return 'Rp '+n.toLocaleString('id-ID');
   return 'Rp '+n;
 }
 
-// ══════════════════════════════════════
-//  SAVE / LOAD
-// ══════════════════════════════════════
 function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(g));}
 function load(){
   const d=localStorage.getItem(SAVE_KEY);
-  if(d) try{g=Object.assign({},DEF,JSON.parse(d));}catch(e){}
+  if(d) {
+    try {
+      const parsed = JSON.parse(d);
+      g = Object.assign({}, DEF, parsed);
+    } catch(e){}
+  }
 }
 
-// ══════════════════════════════════════
-//  UI REFRESH
-// ══════════════════════════════════════
 function refreshAll(){
   document.getElementById('money-val').textContent=rp(g.money);
   document.getElementById('cabang-name').textContent=`CABANG ${g.cabangId} — ${g.cabangName.toUpperCase()}`;
@@ -599,42 +355,42 @@ function refreshAll(){
   if(g.prestigeCount>0){document.getElementById('tag-prestige').style.display='inline-block';}
   document.getElementById('total-level').textContent=g.kokiLv+g.liftLv+g.diningLv+g.marketingLv-3;
 
-  // Stocks
   document.getElementById('st-dapur').textContent=Math.floor(g.stockDapur)+' piring';
   document.getElementById('st-dining').textContent=Math.floor(g.stockDining)+' porsi';
   document.getElementById('per-sec').textContent='+'+rp(perSec)+'/dtk';
-  document.getElementById('dining-rate').textContent='+'+rp(foodPrice()*Math.min(g.stockDining,2*sysBoost)*g.globalMult*sysBoost)+'/siklus';
+  
+  let currentPrice = g.diningLv * 10;
+  if (g.cabangId === 6 && g.diningLv < 5) currentPrice *= 0.2; 
+  document.getElementById('dining-rate').textContent='+'+rp(currentPrice*Math.min(g.stockDining,2*sysBoost)*g.globalMult*sysBoost)+'/siklus';
+  document.getElementById('lift-label').textContent=Math.floor(g.stockLift)+'/'+(g.liftLv*5);
 
-  // Lift label
-  document.getElementById('lift-label').textContent=Math.floor(g.stockLift)+'/'+liftCap();
-
-  // Koki animation
   const kicon=document.getElementById('icon-koki');
-  if(autoEnabled()||g.stockDapur>0) kicon.classList.add('active'); else kicon.classList.remove('active');
+  if((g.kokiLv>=5)||g.stockDapur>0) kicon.classList.add('active'); else kicon.classList.remove('active');
 
-  // Tap button visibility
-  document.getElementById('btn-tap-koki').className='fp-tap'+(autoEnabled()?' disabled':'');
-  document.getElementById('btn-tap-koki').disabled=autoEnabled();
+  const isAuto = g.kokiLv >= 5;
+  document.getElementById('btn-tap-koki').className='fp-tap'+(isAuto?' disabled':'');
+  document.getElementById('btn-tap-koki').disabled=isAuto;
+  
+  if(isMatiLampu) {
+    document.getElementById('btn-tap-koki').textContent = "NYALAKAN LISTRIK";
+    document.getElementById('btn-tap-koki').className='fp-tap';
+    document.getElementById('btn-tap-koki').disabled=false;
+  } else {
+    document.getElementById('btn-tap-koki').textContent = isAuto ? "OTOMATIS" : "TAP MASAK";
+  }
 
-  // Upgrade cards
-  refreshUpgradeCard('koki','Koki & Kompor',g.kokiLv,g.kokiCost,10,
-    g.kokiLv<5?`Tap masak +${cookPower()} piring`:`🤖 AUTO masak +${cookPower()*0.5}/dtk`);
-  refreshUpgradeCard('lift','Kapasitas Lift',g.liftLv,g.liftCost,10,
-    `Angkut maks ${liftCap()} piring/trip`);
-  refreshUpgradeCard('dining','Fasilitas Meja',g.diningLv,g.diningCost,10,
-    `Harga jual ${rp(foodPrice())}/porsi`);
-  refreshUpgradeCard('marketing','Spanduk & Promosi',g.marketingLv,g.marketingCost,8,
-    `${customerRate().toFixed(1)} pelanggan/dtk`);
+  const costMultiplier = g.cabangId === 7 ? 2 : 1;
 
-  // Prestige buttons
-  const b2=document.getElementById('btn-cab2');
-  const b3=document.getElementById('btn-cab3');
-  const b4=document.getElementById('btn-cab4');
-  if(b2){b2.disabled=g.money<5000||g.cabangId>=2;}
-  if(b3){b3.disabled=g.money<50000||g.cabangId>=3;}
-  if(b4){b4.disabled=g.money<500000||g.cabangId>=4;}
+  refreshUpgradeCard('koki','Koki & Kompor',g.kokiLv,g.kokiCost * costMultiplier,10,
+    g.kokiLv<5?`Tap masak +${g.kokiLv} piring`:`🤖 AUTO masak +${g.kokiLv*0.5}/dtk`);
+  refreshUpgradeCard('lift','Kapasitas Lift',g.liftLv,g.liftCost * costMultiplier,10,
+    `Angkut maks ${g.liftLv*5} piring/trip`);
+  refreshUpgradeCard('dining','Fasilitas Meja',g.diningLv,g.diningCost * costMultiplier,10,
+    `Harga jual ${rp(currentPrice)}/porsi`);
+  refreshUpgradeCard('marketing','Spanduk & Promosi',g.marketingLv,g.marketingCost * costMultiplier,8,
+    `${(g.marketingLv*0.5).toFixed(1)} pelanggan/dtk`);
 
-  // Achievements
+  renderCabangCards();
   checkAchievements();
 }
 
@@ -646,7 +402,7 @@ function refreshUpgradeCard(key,name,lv,cost,maxLv,desc){
   const btn=document.getElementById(`btn-u-${key}`);
   btn.disabled=maxed||g.money<cost;
   if(maxed){btn.className='upg-btn maxed';}else{btn.className='upg-btn';}
-  // pip bars
+  
   const bars=document.getElementById(`u-${key}-bars`);
   bars.innerHTML='';
   for(let i=0;i<maxLv;i++){
@@ -656,12 +412,41 @@ function refreshUpgradeCard(key,name,lv,cost,maxLv,desc){
   }
 }
 
-// ══════════════════════════════════════
-//  TAP KOKI
-// ══════════════════════════════════════
+// FUNGSI UTAMALAH YANG MEMBUAT DAFTAR 10 CABANG MUNCUL SECARA OTOMATIS DI HTML
+function renderCabangCards() {
+  const prestigeList = document.getElementById('ach-list-prestige');
+  if (!prestigeList) return;
+  prestigeList.innerHTML = '';
+  
+  DAFTAR_CABANG.forEach(cab => {
+    if (cab.id === 1) return; // Cabang 1 tidak ada tombol beli ruko
+    
+    const card = document.createElement('div');
+    card.className = 'prestige-card';
+    if (g.cabangId >= cab.id) card.style.opacity = '0.5';
+    
+    const isLocked = g.money < cab.cost || g.cabangId >= cab.id;
+    
+    card.innerHTML = `
+      <div class="prestige-title">Cabang ${cab.id} — ${cab.name}</div>
+      <div class="prestige-desc">${cab.desc}<br><b>Butuh:</b> ${rp(cab.cost)} · <b>Multiplier:</b> ${cab.mult}× Duit</div>
+      <button class="prestige-btn" ${isLocked ? 'disabled' : ''} onclick="openPrestigeModal(${cab.id}, ${cab.cost}, ${cab.mult}, '${cab.name}')">
+        ${g.cabangId >= cab.id ? 'Sudah Dibuka ✓' : 'Buka Cabang'}
+      </button>
+    `;
+    prestigeList.appendChild(card);
+  });
+}
+
 function tapKoki(){
-  if(autoEnabled()) return;
-  g.stockDapur+=cookPower();
+  if(isMatiLampu) {
+    isMatiLampu = false;
+    showToast("⚡ Listrik Menyala Kembali!");
+    refreshAll();
+    return;
+  }
+  if(g.kokiLv>=5) return;
+  g.stockDapur+=g.kokiLv;
   g.totalTaps++;
   spawnRipple(document.getElementById('btn-tap-koki'));
   const koki=document.getElementById('icon-koki');
@@ -682,72 +467,75 @@ function spawnRipple(el){
   setTimeout(()=>rip.remove(),600);
 }
 
-// ══════════════════════════════════════
-//  UPGRADE
-// ══════════════════════════════════════
 function doUpgrade(key){
   const maxes={koki:10,lift:10,dining:10,marketing:8};
   const costKey=key+'Cost'; const lvKey=key+'Lv';
   if(g[lvKey]>=maxes[key]) return;
-  if(g.money<g[costKey]) return;
-  g.money-=g[costKey];
+  
+  const costMultiplier = g.cabangId === 7 ? 2 : 1;
+  const realCost = g[costKey] * costMultiplier;
+
+  if(g.money<realCost) return;
+  g.money-=realCost;
   g[lvKey]++;
   g[costKey]=Math.floor(g[costKey]*1.25);
-  showToast('✅ '+key.charAt(0).toUpperCase()+key.slice(1)+' diupgrade ke Lv '+g[lvKey]+'!');
+  showToast('✅ Upgrade Berhasil!');
   refreshAll();
   save();
 }
 
-// ══════════════════════════════════════
-//  MAIN GAME LOOP (1.5s tick)
-// ══════════════════════════════════════
+// ENGINE CORE TIME TICK LOOP
 setInterval(()=>{
-  const mult=g.globalMult*sysBoost;
+  if(isMatiLampu) return;
 
-  // 1. AUTO COOK (koki lv 5+)
-  if(autoEnabled()){
-    g.stockDapur+=cookPower()*0.5*sysBoost;
+  const mult=g.globalMult*sysBoost;
+  
+  let cookSpeed = 1;
+  if (g.cabangId === 9) cookSpeed = 0.7; // Suhu dingin New York
+
+  if(g.kokiLv>=5){
+    g.stockDapur+=g.kokiLv*0.5*sysBoost*cookSpeed;
   }
 
-  // 2. LIFT LOGIC
-  const cap=liftCap();
+  const cap=g.liftLv*5;
   if(liftUp){
-    // Pick up from dapur
     if(g.stockDapur>0){
       const space=cap-g.stockLift;
       const take=Math.min(space,Math.floor(g.stockDapur));
       g.stockDapur-=take;
       g.stockLift+=take;
     }
-    // Move down
     moveLift('down');
     liftUp=false;
   } else {
-    // Deliver to dining
     if(g.stockLift>0){
       g.stockDining+=g.stockLift;
       g.stockLift=0;
     }
-    // Move up
     moveLift('up');
     liftUp=true;
   }
 
-  // 3. DINING SELLS
   let income=0;
   if(g.stockDining>0){
-    const eat=Math.min(g.stockDining,2*sysBoost*g.marketingLv*0.5);
+    const spawnModifier = g.cabangId === 4 ? 2 : 1; // Rush Hour Tangerang
+    const eat=Math.min(g.stockDining,2*sysBoost*g.marketingLv*0.5*spawnModifier);
     g.stockDining-=eat;
-    income=eat*foodPrice()*mult;
+    
+    let basePrice = g.diningLv * 10;
+    if (g.cabangId === 6 && g.diningLv < 5) basePrice *= 0.2; // Warga PIK pilih-pilih
+    
+    income=eat*basePrice*mult;
+
+    if (g.cabangId === 3) income *= 0.95; // Sewa ruko Mulya potongan 5%
+
     g.money+=income;
     g.totalEarned+=income;
     if(income>0) spawnIncomePop(income);
   }
 
-  // Per sec estimate
-  perSec=income/(TICK/1000);
+  perSec=income/1.5;
 
-  // Boost timer countdown
   if(boostTimer>0){
     boostTimer--;
     document.getElementById('boost-timer').textContent='Aktif: '+boostTimer+'s';
@@ -756,39 +544,27 @@ setInterval(()=>{
       document.getElementById('boost-timer').style.display='none';
       document.getElementById('btn-boost').disabled=false;
       document.getElementById('btn-boost').textContent='🎬 TONTON IKLAN';
-      showToast('⚡ Speed Boost selesai!');
     }
+  }
+
+  // Peluang acak mati lampu di Pasar Ceplak
+  if(g.cabangId === 2 && !isMatiLampu && Math.random() < 0.04) {
+    isMatiLampu = true;
+    showToast("⚠️ Listrik Padam! Tap tombol koki untuk menyalakan genset pasar!");
   }
 
   refreshAll();
   save();
-},TICK);
+},1500);
 
-// Smoke animation
-setInterval(()=>{
-  if(!autoEnabled()) return;
-  const smokes=['smoke1','smoke2','smoke3'];
-  smokes.forEach((id,i)=>{
-    const el=document.getElementById(id);
-    if(!el) return;
-    el.style.opacity='0.6';
-    setTimeout(()=>{if(el)el.style.opacity='0';},600+i*200);
-  });
-},2000);
-
-// ── LIFT VISUAL ──
 function moveLift(dir){
   const car=document.getElementById('lift-car');
-  // Ruko is 320 tall SVG, lift shaft from ~90 to ~300
-  // We map floor positions inside the rendered ruko div
   const ruko=document.getElementById('ruko');
+  if(!car || !ruko) return;
   const h=ruko.offsetHeight;
-  const topPos=Math.floor(h*0.28); // dapur level
-  const botPos=Math.floor(h*0.70); // dining level
-  car.style.top=(dir==='up'?topPos:botPos)+'px';
+  car.style.top=(dir==='up'?Math.floor(h*0.28):Math.floor(h*0.70))+'px';
 }
 
-// ── INCOME POPUP ──
 function spawnIncomePop(amount){
   const world=document.getElementById('world');
   const pop=document.createElement('div');
@@ -800,147 +576,111 @@ function spawnIncomePop(amount){
   setTimeout(()=>pop.remove(),1300);
 }
 
-// ── CUSTOMERS (visual) ──
-const EMOJIS=['🧑','👩','👦','👴','👩‍🦱','🧔','👩‍🦳','🧑‍🦲'];
+const EMOJIS=['🧑','👩','👦','👴','🧔'];
 function spawnCustomer(){
   const lane=document.getElementById('customer-lane');
+  if(!lane) return;
   const c=document.createElement('div');
   c.className='customer';
   c.textContent=EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
   const dur=4+Math.random()*4;
   c.style.animationDuration=dur+'s';
-  c.style.animationDelay=(Math.random()*2)+'s';
   lane.appendChild(c);
-  setTimeout(()=>c.remove(),(dur+3)*1000);
+  setTimeout(()=>c.remove(),(dur+2)*1000);
 }
+
 setInterval(()=>{
-  if(Math.random()<customerRate()/5) spawnCustomer();
+  const competitorModifier = g.cabangId === 5 ? 0.5 : 1; // Saingan Jakarta
+  if(Math.random() < (g.marketingLv * 0.1 * competitorModifier)) spawnCustomer();
 },1000);
 
-// ══════════════════════════════════════
-//  PRESTIGE / CABANG
-// ══════════════════════════════════════
 function openPrestigeModal(id,cost,mult,name){
-  if(g.money<cost||g.cabangId>=id) return;
   modalData={id,cost,mult,name};
   document.getElementById('modal-title').textContent='Buka Cabang '+name+'?';
-  document.getElementById('modal-body').textContent=
-    `Kamu akan membayar ${rp(cost)} dan me-reset semua progress ruko saat ini. Sebagai gantinya, kamu mendapat bonus pendapatan permanen ${mult}× untuk selamanya!`;
+  document.getElementById('modal-body').textContent=`Kamu akan membayar ${rp(cost)} dan mereset kemajuan warung saat ini. Sebagai gantinya, kamu mendapat bonus pendapatan permanen ${mult}×!`;
   document.getElementById('modal-bg').classList.add('open');
 }
 function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
+
 function confirmPrestige(){
   const {id,cost,mult,name}=modalData;
   closeModal();
+  
   g=Object.assign({},DEF);
   g.cabangId=id;
   g.cabangName=name;
   g.globalMult=mult;
   g.prestigeCount++;
-  showToast('🎉 Cabang '+name+' resmi dibuka! Bonus '+mult+'×!');
+  
+  showToast('🎉 Cabang '+name+' Resmi Dibuka!');
   switchTab('upgrade',document.querySelector('.tab'));
   refreshAll();
   save();
 }
 
-// ══════════════════════════════════════
-//  BOOSTERS
-// ══════════════════════════════════════
 function watchAd(){
   const btn=document.getElementById('btn-boost');
   btn.disabled=true;
-  btn.textContent='🎬 Memutar iklan... 5s';
   let c=5;
   const iv=setInterval(()=>{
     c--;
-    btn.textContent='🎬 Memutar iklan... '+c+'s';
+    btn.textContent='Iklan... '+c+'s';
     if(c<=0){
       clearInterval(iv);
       sysBoost=2;
       boostTimer=30;
-      const timer=document.getElementById('boost-timer');
-      timer.style.display='block';
-      timer.textContent='Aktif: 30s';
-      showToast('⚡ Speed Boost 2× aktif 30 detik!');
-      refreshAll();
-    }
-  },1000);
-}
-function watchAd2(){
-  const btn=document.getElementById('btn-boost2');
-  btn.disabled=true;
-  btn.textContent='Memutar... 5s';
-  let c=5;
-  const iv=setInterval(()=>{
-    c--;
-    btn.textContent='Memutar... '+c+'s';
-    if(c<=0){
-      clearInterval(iv);
-      const bonus=Math.max(500, Math.floor(g.money*0.05));
-      g.money+=bonus;
-      g.totalEarned+=bonus;
-      showToast('💰 Bonus +'+rp(bonus)+' diterima!');
-      btn.textContent='🎬 TONTON IKLAN BONUS';
-      const timer=document.getElementById('boost-timer2');
-      timer.style.display='block';
-      timer.textContent='Cooldown 60s...';
-      let cd=60;
-      const iv2=setInterval(()=>{
-        cd--;
-        timer.textContent='Cooldown '+cd+'s...';
-        if(cd<=0){clearInterval(iv2);timer.style.display='none';btn.disabled=false;}
-      },1000);
+      document.getElementById('boost-timer').style.display='block';
+      showToast('⚡ Speed Boost 2× Aktif!');
       refreshAll();
     }
   },1000);
 }
 
-// ══════════════════════════════════════
-//  ACHIEVEMENTS
-// ══════════════════════════════════════
+function watchAd2(){
+  const btn=document.getElementById('btn-boost2');
+  btn.disabled=true;
+  let c=5;
+  const iv=setInterval(()=>{
+    c--;
+    btn.textContent='Iklan... '+c+'s';
+    if(c<=0){
+      clearInterval(iv);
+      const bonus=Math.max(500, Math.floor(g.money*0.05));
+      g.money+=bonus;
+      showToast('💰 Bonus Dana Masuk!');
+      btn.textContent='🎬 TONTON IKLAN BONUS';
+      btn.disabled=false;
+      refreshAll();
+    }
+  },1000);
+}
+
 const ACHIEVEMENTS=[
   {id:'first_tap',icon:'👆',name:'Tangan Pertama',desc:'Tap koki pertama kali',check:()=>g.totalTaps>=1},
   {id:'earn_1000',icon:'💰',name:'Seribu Rupiah!',desc:'Kumpulkan Rp 1.000',check:()=>g.totalEarned>=1000},
-  {id:'earn_10k',icon:'💵',name:'Uang Jajan',desc:'Kumpulkan Rp 10.000',check:()=>g.totalEarned>=10000},
-  {id:'earn_100k',icon:'🤑',name:'Juragan Mie',desc:'Kumpulkan Rp 100.000',check:()=>g.totalEarned>=100000},
-  {id:'koki_5',icon:'🤖',name:'Koki Robot',desc:'Upgrade Koki ke Lv 5 (auto masak!)',check:()=>g.kokiLv>=5},
-  {id:'koki_max',icon:'👨‍🍳',name:'Masterchef',desc:'Koki mencapai level maksimal',check:()=>g.kokiLv>=10},
-  {id:'prestige1',icon:'🌟',name:'Ekspansi Pertama',desc:'Buka cabang pertama',check:()=>g.prestigeCount>=1},
-  {id:'prestige3',icon:'🏙️',name:'Raja Warmindo',desc:'Buka 3 cabang berbeda',check:()=>g.prestigeCount>=3},
-  {id:'tap_100',icon:'💪',name:'Jari Besi',desc:'Tap koki 100 kali',check:()=>g.totalTaps>=100},
+  {id:'koki_5',icon:'🤖',name:'Koki Robot',desc:'Upgrade Koki ke Lv 5 (Auto Masak)',check:()=>g.kokiLv>=5}
 ];
 
 function checkAchievements(){
   ACHIEVEMENTS.forEach(a=>{
     if(!g.achUnlocked.includes(a.id)&&a.check()){
       g.achUnlocked.push(a.id);
-      showToast('🏆 Trofi: '+a.name+'!');
+      showToast('🏆 Trofi Baru Didapat!');
       save();
     }
   });
-  renderAchievements();
 }
 
 function renderAchievements(){
   const list=document.getElementById('ach-list');
+  if(!list) return;
   list.innerHTML='';
   ACHIEVEMENTS.forEach(a=>{
-    const unlocked=g.achUnlocked.includes(a.id);
-    const d=document.createElement('div');
-    d.className='ach-card'+(unlocked?'':' locked');
-    d.innerHTML=`<div class="ach-icon">${a.icon}</div>
-      <div class="ach-info">
-        <div class="ach-name">${a.name}</div>
-        <div class="ach-desc">${a.desc}</div>
-      </div>
-      ${unlocked?'<div class="ach-badge">✓ DAPAT</div>':''}`;
-    list.appendChild(d);
+    const un=g.achUnlocked.includes(a.id);
+    list.innerHTML+=`<div class="ach-card ${un?'':'locked'}"><div class="ach-icon">${a.icon}</div><div class="ach-info"><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div>${un?'<div class="ach-badge">✓ DAPAT</div>':''}</div>`;
   });
 }
 
-// ══════════════════════════════════════
-//  TAB SWITCHING
-// ══════════════════════════════════════
 function switchTab(name, btn){
   ['upgrade','prestige','boost','ach'].forEach(t=>{
     document.getElementById('tab-'+t).classList.toggle('hidden', t!==name);
@@ -950,9 +690,6 @@ function switchTab(name, btn){
   if(name==='ach') renderAchievements();
 }
 
-// ══════════════════════════════════════
-//  TOAST
-// ══════════════════════════════════════
 let toastTimer;
 function showToast(msg){
   const t=document.getElementById('toast');
@@ -962,22 +699,9 @@ function showToast(msg){
   toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
 }
 
-// ══════════════════════════════════════
-//  HIDDEN CLASS
-// ══════════════════════════════════════
-const style=document.createElement('style');
-style.textContent='.hidden{display:none!important;}';
-document.head.appendChild(style);
-
-// ══════════════════════════════════════
-//  BOOT
-// ══════════════════════════════════════
 load();
 refreshAll();
-moveLift('up');
-
-// Initial customers
-setTimeout(()=>{spawnCustomer();spawnCustomer();},1000);
+window.onload = () => { moveLift('up'); };
 </script>
 </body>
 </html>
